@@ -88,7 +88,7 @@ class Expense {
 
 class Target {
   int id;
-  int amount;
+  double amount;
   DateTime date;
   DateTime lastEdit;
   String? uuid;
@@ -102,7 +102,7 @@ class Target {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> res = {
-      colTargetID: id,
+      //colTargetID: id,
       colTargetAmount: amount,
       colTargetDate: date.toIso8601String(),
       colTargetLastEdit: lastEdit.toIso8601String(),

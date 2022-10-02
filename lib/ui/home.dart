@@ -7,6 +7,7 @@ import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:intl/intl.dart';
 
 import '../models/models.dart';
+import '../utils/utils.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -23,6 +24,7 @@ class Home extends StatelessWidget {
             ),
           ],
         ),
+        drawer: NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
         body: Padding(
           padding: const EdgeInsets.only(left: 10.0, right: 10.0),
@@ -45,7 +47,7 @@ class Home extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () => showCreateExpenseDialog(context),
           child: const Icon(Icons.add),
-          tooltip: "Create New Event",
+          tooltip: "Create New Expense",
         ),
       ),
     );
@@ -165,25 +167,6 @@ class ExpenseItem extends StatelessWidget {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
       const InsertEditExpenseDialog(ExpenseDialogMode.edit),
-    );
-  }
-}
-
-class RowWidget extends StatelessWidget {
-  final String text;
-
-  const RowWidget(this.text, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: Text(text)),
-        ],
-      ),
     );
   }
 }

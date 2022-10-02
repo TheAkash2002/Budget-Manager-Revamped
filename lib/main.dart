@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       getPages: [
         GetPage(
-          name: '/',
+          name: '/home',
           page: () => Home(),
           binding: BindingsBuilder(() {
             Get.put<ExpenseController>(ExpenseController());

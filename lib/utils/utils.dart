@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 /// Utility to display [message] as a toast.
 void showToast(String message, BuildContext context) {
@@ -42,4 +44,57 @@ void openDatePicker(BuildContext context, DateTime initialDate, void Function(Da
   }catch(_){
     showToast("There was an error in capturing the date.", context);
   }
+}
+
+class RowWidget extends StatelessWidget {
+  final String text;
+
+  const RowWidget(this.text, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+}
+
+DateTime getFirstDayOfMonth(DateTime dateTime){
+  return DateTime(dateTime.year, dateTime.month);
+}
+
+class NavDrawer extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text('Drawer Header'),
+          ),
+          ListTile(
+            title: const Text('Expenses'),
+            tileColor: Get.currentRoute == '/home' ? Colors.grey[300] : null,
+            onTap: () => Get.offAllNamed('/home'),
+          ),
+          ListTile(
+            title: const Text('Targets'),
+            tileColor: Get.currentRoute == '/targets' ? Colors.grey[300] : null,
+            onTap: () => Get.offAllNamed('/targets'),
+          ),
+        ],
+      )
+    );
+  }
+
 }

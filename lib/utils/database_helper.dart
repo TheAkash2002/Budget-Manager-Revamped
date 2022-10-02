@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../models/models.dart';
+import 'utils.dart';
 
 const String expenseTableName = "expenses";
 const String colExpenseID = "ExpenseID";
@@ -67,14 +68,16 @@ Future<void> insertTarget(Target target) async{
 }
 
 Future<bool> isTargetSet(DateTime dateTime) async{
-  return await getTarget(dateTime) != -1;
+  double target = await getTarget(dateTime);
+  print(target);
+  return target != -1;
 }
 
-Future<int> getTarget(DateTime dateTime) async{
+Future<double> getTarget(DateTime dateTime) async{
   final List<Map<String, dynamic>> targetMaps = await (await getDatabase())
       .query(
     targetTableName,
-    where: '$colTargetDate = ',
+    where: '$colTargetDate = ?',
     whereArgs: [getFirstDayOfMonth(dateTime).toIso8601String()],
   );
   return targetMaps.isEmpty ? -1 : Target.fromMap(targetMaps[0]).amount;
@@ -145,8 +148,4 @@ Future<List<String>> getExistingCategoriesList() async{
   final List<Map<String, dynamic>> maps = await (await getDatabase())
       .rawQuery("SELECT DISTINCT $colExpenseCategory FROM $expenseTableName");
   return List.generate(maps.length, (index) => maps[index][colExpenseCategory]);
-}
-
-DateTime getFirstDayOfMonth(DateTime dateTime){
-  return DateTime(dateTime.year, dateTime.month);
 }
