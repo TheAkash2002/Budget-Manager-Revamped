@@ -24,7 +24,7 @@ const String colTargetUUID = "TargetUUID";
 Future<Database> getDatabase() async {
   var databasesPath = await getDatabasesPath();
   String path = join(databasesPath, 'budget.db');
-  return openDatabase(path, onCreate: (db, version) async{
+  return openDatabase(path, onCreate: (db, version) async {
     await db.execute('CREATE TABLE $expenseTableName ('
         '$colExpenseID INTEGER PRIMARY KEY AUTOINCREMENT,'
         '$colExpenseAmount REAL NOT NULL,'
@@ -40,42 +40,38 @@ Future<Database> getDatabase() async {
         '$colTargetDate DATE NOT NULL,'
         '$colTargetLastEdit DATETIME NOT NULL,'
         '$colTargetUUID STRING)');
-  },
-  version: 1);
+  }, version: 1);
 }
 
-Future<void> updateCategory(String oldCategory, String newCategory) async{
-  final List<Map<String, dynamic>> maps = await (await getDatabase())
-      .query(
-      expenseTableName,
-      where: '$colExpenseCategory = ?',
-      whereArgs: [oldCategory],
+Future<void> updateCategory(String oldCategory, String newCategory) async {
+  final List<Map<String, dynamic>> maps = await (await getDatabase()).query(
+    expenseTableName,
+    where: '$colExpenseCategory = ?',
+    whereArgs: [oldCategory],
   );
-  List<Expense> updatedExpenses = List.generate(maps.length, (index) => Expense.fromMap(maps[index]));
-  for(Expense expense in updatedExpenses){
+  List<Expense> updatedExpenses =
+      List.generate(maps.length, (index) => Expense.fromMap(maps[index]));
+  for (Expense expense in updatedExpenses) {
     expense.category = newCategory;
     updateExpense(expense);
   }
 }
 
-Future<void> insertTarget(Target target) async{
-  await (await getDatabase())
-      .insert(
+Future<void> insertTarget(Target target) async {
+  await (await getDatabase()).insert(
     targetTableName,
     target.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
 }
 
-Future<bool> isTargetSet(DateTime dateTime) async{
-  double target = await getTarget(dateTime);
-  print(target);
-  return target != -1;
+Future<bool> isTargetSet(DateTime dateTime) async {
+  return await getTarget(dateTime) != -1;
 }
 
-Future<double> getTarget(DateTime dateTime) async{
-  final List<Map<String, dynamic>> targetMaps = await (await getDatabase())
-      .query(
+Future<double> getTarget(DateTime dateTime) async {
+  final List<Map<String, dynamic>> targetMaps =
+      await (await getDatabase()).query(
     targetTableName,
     where: '$colTargetDate = ?',
     whereArgs: [getFirstDayOfMonth(dateTime).toIso8601String()],
@@ -83,16 +79,16 @@ Future<double> getTarget(DateTime dateTime) async{
   return targetMaps.isEmpty ? -1 : Target.fromMap(targetMaps[0]).amount;
 }
 
-Future<List<Target>> getAllTargets() async{
-  final List<Map<String, dynamic>> maps = await (await getDatabase()).query(targetTableName);
-  return List.generate(maps.length, (i){
+Future<List<Target>> getAllTargets() async {
+  final List<Map<String, dynamic>> maps =
+      await (await getDatabase()).query(targetTableName);
+  return List.generate(maps.length, (i) {
     return Target.fromMap(maps[i]);
   });
 }
 
-Future<void> updateTarget(Target target) async{
-  await (await getDatabase())
-      .update(
+Future<void> updateTarget(Target target) async {
+  await (await getDatabase()).update(
     targetTableName,
     target.toMap(),
     where: '$colTargetID = ?',
@@ -100,34 +96,45 @@ Future<void> updateTarget(Target target) async{
   );
 }
 
-Future<void> deleteTarget(int id) async{
-  await (await getDatabase())
-      .delete(
+Future<void> deleteTarget(int id) async {
+  await (await getDatabase()).delete(
     targetTableName,
     where: '$colTargetID = ?',
     whereArgs: [id],
   );
 }
 
-Future<void> insertExpense(Expense expense) async{
-  await (await getDatabase())
-      .insert(
+Future<void> insertExpense(Expense expense) async {
+  await (await getDatabase()).insert(
     expenseTableName,
     expense.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
 }
 
-Future<List<Expense>> getAllExpenses() async{
-  final List<Map<String, dynamic>> maps = await (await getDatabase()).query(expenseTableName);
-  return List.generate(maps.length, (i){
+Future<List<Expense>> getAllExpenses() async {
+  final List<Map<String, dynamic>> maps =
+      await (await getDatabase()).query(expenseTableName);
+  return List.generate(maps.length, (i) {
     return Expense.fromMap(maps[i]);
   });
 }
 
-Future<void> updateExpense(Expense expense) async{
-  await (await getDatabase())
-      .update(
+Future<List<Expense>> getAllExpensesInGivenMonth(DateTime dateTime) async {
+  String firstDay = getFirstDayOfMonth(dateTime).toIso8601String();
+  String lastDay = getLastDayOfMonth(dateTime).toIso8601String();
+  final List<Map<String, dynamic>> maps = await (await getDatabase()).query(
+    expenseTableName,
+    where: "$colExpenseDate BETWEEN ? AND ?",
+    whereArgs: [firstDay, lastDay],
+  );
+  return List.generate(maps.length, (i) {
+    return Expense.fromMap(maps[i]);
+  });
+}
+
+Future<void> updateExpense(Expense expense) async {
+  await (await getDatabase()).update(
     expenseTableName,
     expense.toMap(),
     where: '$colExpenseID = ?',
@@ -135,16 +142,15 @@ Future<void> updateExpense(Expense expense) async{
   );
 }
 
-Future<void> deleteExpense(int id) async{
-  await (await getDatabase())
-      .delete(
+Future<void> deleteExpense(int id) async {
+  await (await getDatabase()).delete(
     expenseTableName,
     where: '$colExpenseID = ?',
     whereArgs: [id],
   );
 }
 
-Future<List<String>> getExistingCategoriesList() async{
+Future<List<String>> getExistingCategoriesList() async {
   final List<Map<String, dynamic>> maps = await (await getDatabase())
       .rawQuery("SELECT DISTINCT $colExpenseCategory FROM $expenseTableName");
   return List.generate(maps.length, (index) => maps[index][colExpenseCategory]);

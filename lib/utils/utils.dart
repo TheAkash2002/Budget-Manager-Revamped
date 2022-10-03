@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 /// Utility to display [message] as a toast.
 void showToast(String message, BuildContext context) {
@@ -25,7 +24,7 @@ void showToast(String message, BuildContext context) {
   fToast.showToast(
     child: toast,
     gravity: ToastGravity.BOTTOM,
-    toastDuration: Duration(seconds: 2),
+    toastDuration: const Duration(seconds: 2),
   );
 }
 
@@ -69,6 +68,10 @@ DateTime getFirstDayOfMonth(DateTime dateTime){
   return DateTime(dateTime.year, dateTime.month);
 }
 
+DateTime getLastDayOfMonth(DateTime dateTime){
+  return DateTime(dateTime.year, dateTime.month+1, 0);
+}
+
 class NavDrawer extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
@@ -84,8 +87,8 @@ class NavDrawer extends StatelessWidget{
           ),
           ListTile(
             title: const Text('Expenses'),
-            tileColor: Get.currentRoute == '/home' ? Colors.grey[300] : null,
-            onTap: () => Get.offAllNamed('/home'),
+            tileColor: Get.currentRoute == '/' ? Colors.grey[300] : null,
+            onTap: () => Get.offAllNamed('/'),
           ),
           ListTile(
             title: const Text('Targets'),

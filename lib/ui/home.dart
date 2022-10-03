@@ -2,8 +2,6 @@ import 'package:budget_manager_revamped/controller/expense_controller.dart';
 import 'package:budget_manager_revamped/ui/insert_edit_expense.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:intl/intl.dart';
 
 import '../models/models.dart';
@@ -57,12 +55,12 @@ class Home extends StatelessWidget {
   void navigateToLoginPage() {}
 
   void showCreateExpenseDialog(BuildContext context) async {
-    Get.find<ExpenseController>().refreshInsertEditExpenseControllers();
+    await Get.find<ExpenseController>().refreshInsertEditExpenseControllers();
     await showDialog<bool?>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
-          const InsertEditExpenseDialog(ExpenseDialogMode.insert),
+          InsertEditExpenseDialog(ExpenseDialogMode.insert),
     );
   }
 
@@ -83,7 +81,7 @@ class Home extends StatelessWidget {
 
 class ExpenseItem extends StatelessWidget {
   final Expense expense;
-  final void Function(BuildContext) editExpenseController;
+  final void Function(BuildContext, ExpenseDialogMode) editExpenseController;
   final void Function(int) deleteExpenseController;
 
   const ExpenseItem(
@@ -161,15 +159,15 @@ class ExpenseItem extends StatelessWidget {
   }
 
   void showEditExpenseDialog(BuildContext context) async {
-    Get.find<ExpenseController>().instantiateEditExpenseControllers(expense);
+    await Get.find<ExpenseController>().instantiateEditExpenseControllers(expense);
     await showDialog<bool?>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
-      const InsertEditExpenseDialog(ExpenseDialogMode.edit),
+      InsertEditExpenseDialog(ExpenseDialogMode.edit),
     );
   }
 }
 
 //TODO: Split into Payments vs Loans
-//TODO: Drawer: Targets,AtAGlance,TrackRelativeChange,Sync
+//TODO: Drawer: AtAGlance,TrackRelativeChange,Sync
