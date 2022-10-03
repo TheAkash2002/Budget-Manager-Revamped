@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../controller/tab_controller.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
 
 class Home extends StatelessWidget {
+  final MyTabController _tabx = Get.put(MyTabController());
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExpenseController>(
@@ -21,26 +24,42 @@ class Home extends StatelessWidget {
               tooltip: "Log Out",
             ),
           ],
+          bottom: TabBar(
+            controller: _tabx.controller,
+            tabs: _tabx.myTabs,
+          ),
         ),
         drawer: NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          child: RefreshIndicator(
-            onRefresh: _.refreshExpensesList,
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: ListView.builder(
-                    itemCount: _.allExpenses.length,
-                    itemBuilder: (context, index) => ExpenseItem(
-                        _.allExpenses[index], _.editExpense, _.removeExpense),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        body: TabBarView(
+          controller: _tabx.controller,
+          children: _tabx.myTabs
+              .map((tab) => Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: RefreshIndicator(
+                      onRefresh: _.refreshExpensesList,
+                      child: Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            child: ListView.builder(
+                              itemCount: (tab.text == 'Payments'
+                                      ? _.allPayments
+                                      : _.allLoans)
+                                  .length,
+                              itemBuilder: (context, index) => ExpenseItem(
+                                  (tab.text == 'Payments'
+                                      ? _.allPayments
+                                      : _.allLoans)[index],
+                                  _.editExpense,
+                                  _.removeExpense),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))
+              .toList(),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => showCreateExpenseDialog(context),
@@ -104,13 +123,17 @@ class ExpenseItem extends StatelessWidget {
         children: [
           Expanded(
             flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                RowWidget("Amount: ${expense.amount}"),
-                RowWidget("Category: ${expense.category}"),
-                RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
-              ],
+            child: InkWell(
+              onTap: () => showExpenseDetailsDialog(context),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  RowWidget("Amount: ${expense.amount}"),
+                  RowWidget("Category: ${expense.category}"),
+                  RowWidget("Type: ${toExpenseDirectionString(expense.direction)}"),
+                  RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
+                ],
+              ),
             ),
           ),
           Column(
@@ -139,7 +162,8 @@ class ExpenseItem extends StatelessWidget {
       barrierDismissible: false, // user must tap button!
       builder: (ctx) => AlertDialog(
         title: const Text("Delete Expense"),
-        content: const Text("Are you sure you want to delete this expense? This action cannot be undone!"),
+        content: const Text(
+            "Are you sure you want to delete this expense? This action cannot be undone!"),
         actions: <Widget>[
           TextButton(
             child: const Text('Cancel'),
@@ -153,21 +177,61 @@ class ExpenseItem extends StatelessWidget {
       ),
     );
 
-    if(confirmDelete != null && confirmDelete){
+    if (confirmDelete != null && confirmDelete) {
       deleteExpenseController(expense.id);
     }
   }
 
   void showEditExpenseDialog(BuildContext context) async {
-    await Get.find<ExpenseController>().instantiateEditExpenseControllers(expense);
+    await Get.find<ExpenseController>()
+        .instantiateEditExpenseControllers(expense);
     await showDialog<bool?>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
-      InsertEditExpenseDialog(ExpenseDialogMode.edit),
+          InsertEditExpenseDialog(ExpenseDialogMode.edit),
+    );
+  }
+
+  void showExpenseDetailsDialog(BuildContext context) => showDialog<bool?>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) =>
+        ExpenseDetailsDialog(expense),
+  );
+}
+
+class ExpenseDetailsDialog extends StatelessWidget{
+  final Expense expense;
+  const ExpenseDetailsDialog(this.expense);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Details"),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Center(
+          child: ListView(
+            children: [
+              RowWidget("Amount: ${expense.amount}"),
+              RowWidget("Type: ${toExpenseDirectionString(expense.direction)}"),
+              RowWidget("Category: ${expense.category}"),
+              RowWidget("Description: ${expense.description}"),
+              RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
+            ],
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Dismiss'),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
     );
   }
 }
 
-//TODO: Split into Payments vs Loans
+//TODO: NotifReader
 //TODO: Drawer: AtAGlance,TrackRelativeChange,Sync

@@ -15,21 +15,33 @@ class ExpenseController extends GetxController {
   DateTime pickerDate = DateTime.now();
   ExpenseDirection expenseDirection = ExpenseDirection.payment;
 
-  late List<Expense> allExpenses;
+  //late List<Expense> allExpenses;
+  late List<Expense> allPayments;
+  late List<Expense> allLoans;
   late List<String> allCategories;
 
   Expense? currentExpense;
 
   ExpenseController() {
-    allExpenses = List.empty();
+    allPayments = List.empty();
+    allLoans = List.empty();
+    allCategories = List.empty();
     amountController = TextEditingController();
     categoryController = TextEditingController();
     descriptionController = TextEditingController();
     allCategories = List.empty();
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    refreshExpensesList();
+  }
+
   Future<void> refreshExpensesList() async {
-    allExpenses = await getAllExpenses();
+    List<Expense> allExpenses = await getAllExpenses();
+    allPayments = allExpenses.where((expense) => expense.direction == ExpenseDirection.payment).toList();
+    allLoans = allExpenses.where((expense) => expense.direction != ExpenseDirection.payment).toList();
     update();
   }
 
