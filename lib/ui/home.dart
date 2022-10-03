@@ -130,7 +130,8 @@ class ExpenseItem extends StatelessWidget {
                 children: [
                   RowWidget("Amount: ${expense.amount}"),
                   RowWidget("Category: ${expense.category}"),
-                  RowWidget("Type: ${toExpenseDirectionString(expense.direction)}"),
+                  if(expense.direction != ExpenseDirection.payment)
+                    RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
                   RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
                 ],
               ),
@@ -215,7 +216,7 @@ class ExpenseDetailsDialog extends StatelessWidget{
           child: ListView(
             children: [
               RowWidget("Amount: ${expense.amount}"),
-              RowWidget("Type: ${toExpenseDirectionString(expense.direction)}"),
+              RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
               RowWidget("Category: ${expense.category}"),
               RowWidget("Description: ${expense.description}"),
               RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),

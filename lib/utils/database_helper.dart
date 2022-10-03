@@ -81,7 +81,7 @@ Future<double> getTarget(DateTime dateTime) async {
 
 Future<List<Target>> getAllTargets() async {
   final List<Map<String, dynamic>> maps =
-      await (await getDatabase()).query(targetTableName);
+      await (await getDatabase()).query(targetTableName, orderBy: "$colTargetDate DESC");
   return List.generate(maps.length, (i) {
     return Target.fromMap(maps[i]);
   });
@@ -114,7 +114,7 @@ Future<void> insertExpense(Expense expense) async {
 
 Future<List<Expense>> getAllExpenses() async {
   final List<Map<String, dynamic>> maps =
-      await (await getDatabase()).query(expenseTableName);
+      await (await getDatabase()).query(expenseTableName, orderBy: "$colExpenseDate DESC");
   return List.generate(maps.length, (i) {
     return Expense.fromMap(maps[i]);
   });
@@ -127,6 +127,7 @@ Future<List<Expense>> getAllExpensesInGivenMonth(DateTime dateTime) async {
     expenseTableName,
     where: "$colExpenseDate BETWEEN ? AND ?",
     whereArgs: [firstDay, lastDay],
+    orderBy: "$colExpenseDate DESC",
   );
   return List.generate(maps.length, (i) {
     return Expense.fromMap(maps[i]);

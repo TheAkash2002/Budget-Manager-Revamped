@@ -19,6 +19,23 @@ String toExpenseDirectionString(ExpenseDirection direction) {
   }
 }
 
+const String UI_PAYMENT = "Payment";
+const String UI_LOAN_CREDIT = "Credit";
+const String UI_LOAN_DEBIT = "Debit";
+
+String toExpenseDirectionUIString(ExpenseDirection direction) {
+  switch (direction) {
+    case ExpenseDirection.payment:
+      return UI_PAYMENT;
+    case ExpenseDirection.loan_credit:
+      return UI_LOAN_CREDIT;
+    case ExpenseDirection.loan_debit:
+      return UI_LOAN_DEBIT;
+    default:
+      return "Unknown";
+  }
+}
+
 ExpenseDirection fromExpenseDirectionString(String direction) {
   switch (direction) {
     case PAYMENT:
