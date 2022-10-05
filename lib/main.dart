@@ -6,9 +6,11 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'controller/expense_controller.dart';
 import 'ui/home.dart';
+import 'utils/notification_service.dart';
 
 void main() {
   runApp(const MyApp());
+  initializeNotificationService();
 }
 
 class MyApp extends StatelessWidget {

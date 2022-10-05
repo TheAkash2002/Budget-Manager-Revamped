@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.princeakash.budget_manager_revamped">
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
    <application
         android:label="budget_manager_revamped"
         android:icon="@mipmap/ic_launcher">
@@ -9,7 +12,8 @@
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -32,6 +36,24 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+       <receiver android:name="com.princeakash.budget_manager_revamped.NotificationBroadcastReceiver"
+           android:enabled="true" android:exported="true">
+           <intent-filter>
+               <action android:name="com.princeakash.budget_manager_revamped.NOTIFICATION" />
+               <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+           </intent-filter>
+       </receiver>
+       <service android:name="com.princeakash.budget_manager_revamped.NotificationPropagationService"
+           android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
+       <service
+           android:label="notifications"
+           android:name="com.princeakash.budget_manager_revamped.NotificationListener"
+           android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+           android:exported="true">
+           <intent-filter>
+               <action android:name="android.service.notification.NotificationListenerService" />
+           </intent-filter>
+       </service>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

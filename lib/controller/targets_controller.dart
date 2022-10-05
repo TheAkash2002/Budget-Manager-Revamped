@@ -9,6 +9,12 @@ class TargetsController extends GetxController{
   late TextEditingController amountController;
   late DateTime pickerDate;
 
+  @override
+  void onInit(){
+    super.onInit();
+    refreshTargetsList();
+  }
+
   TargetsController(){
     amountController = TextEditingController();
     pickerDate = DateTime.now();
