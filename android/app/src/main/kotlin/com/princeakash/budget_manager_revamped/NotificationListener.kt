@@ -12,7 +12,7 @@ import android.util.Log;
 
 @SuppressLint("OverrideAbstract")
 @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR2)
-class NotificationListener: NotificationListenerService() {
+class NotificationListener : NotificationListenerService() {
     companion object {
         val NOTIFICATION_INTENT = "com.princeakash.budget_manager_revamped.NOTIFICATION"
         val NOTIFICATION_PACKAGE_NAME = "notification_package_name"
@@ -21,13 +21,16 @@ class NotificationListener: NotificationListenerService() {
         val MESSAGER_PACKAGE = "com.google.android.apps.messaging"
         val PAYTM_PACKAGE = "net.one97.paytm"
         val PHONEPE_PACKAGE = "com.phonepe.app"
+        val GPAY_PACKAGE = "com.google.android.apps.nbu.paisa.user"
+        val SBI_PACKAGE = "com.sbi.lotusintouch"
+        val ICICI_PACKAGE = "com.csam.icici.bank.imobile"
         val TAG = "NotificationListener"
-        val allowedPackages = listOf(PAYTM_PACKAGE, PHONEPE_PACKAGE)
+        val allowedPackages = listOf(PAYTM_PACKAGE, PHONEPE_PACKAGE, GPAY_PACKAGE, SBI_PACKAGE, ICICI_PACKAGE)
     }
 
-    override fun onNotificationPosted(notification: StatusBarNotification){
+    override fun onNotificationPosted(notification: StatusBarNotification) {
         val packageName: String = notification.getPackageName()
-        if(!Companion.allowedPackages.contains(packageName)){
+        if (!Companion.allowedPackages.contains(packageName)) {
             Log.e(TAG, "Notif from useless package, hence Broadcast not fired!")
             return
         }

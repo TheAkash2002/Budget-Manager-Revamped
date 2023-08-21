@@ -1,22 +1,34 @@
 import 'package:budget_manager_revamped/models/models.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 
 const String MESSAGER_PACKAGE = "com.google.android.apps.messaging";
 const String PAYTM_PACKAGE = "net.one97.paytm";
 const String PHONEPE_PACKAGE = "com.phonepe.app";
+const String GPAY_PACKAGE = "com.google.android.apps.nbu.paisa.user";
+const String SBI_PACKAGE = "com.sbi.lotusintouch";
+const String ICICI_PACKAGE = "com.csam.icici.bank.imobile";
 
 enum CapturedNotificationType {
   PAYTM_MESSAGE,
   PHONEPE_MESSAGE,
+  GPAY_MESSAGE,
+  SBI_MESSAGE,
   ICICI_MESSAGE,
   PAYTM_NOTIF,
   PHONEPE_NOTIF,
+  GPAY_NOTIF,
+  SBI_NOTIF,
+  ICICI_NOTIF,
   UNKNOWN
 }
 
 class CapturedNotification {
-  static final allowedPackages = [PAYTM_PACKAGE, PHONEPE_PACKAGE];
+  static final allowedPackages = [
+    PAYTM_PACKAGE,
+    PHONEPE_PACKAGE,
+    ICICI_PACKAGE,
+    SBI_PACKAGE,
+    GPAY_PACKAGE
+  ];
   final String? packageName;
   final String? sender;
   final String? content;
@@ -36,15 +48,35 @@ class CapturedNotification {
     if (packageName == PAYTM_PACKAGE) {
       return CapturedNotificationType.PAYTM_NOTIF;
     }
+    if (packageName == GPAY_PACKAGE) {
+      return CapturedNotificationType.GPAY_NOTIF;
+    }
+    if (packageName == ICICI_PACKAGE) {
+      return CapturedNotificationType.ICICI_NOTIF;
+    }
+    if (packageName == SBI_PACKAGE) {
+      return CapturedNotificationType.SBI_NOTIF;
+    }
     if (sender != null) {
-      if (sender!.toLowerCase().contains("paytm") || content!.toLowerCase().contains("paytm")) {
+      if (sender!.toLowerCase().contains("paytm") ||
+          content!.toLowerCase().contains("paytm")) {
         return CapturedNotificationType.PAYTM_MESSAGE;
       }
-      if (sender!.toLowerCase().contains("phonepe") || content!.toLowerCase().contains("phonepe")) {
+      if (sender!.toLowerCase().contains("phonepe") ||
+          content!.toLowerCase().contains("phonepe")) {
         return CapturedNotificationType.PHONEPE_MESSAGE;
       }
-      if (sender!.toLowerCase().contains("icici") || content!.toLowerCase().contains("icici")) {
+      if (sender!.toLowerCase().contains("icici") ||
+          content!.toLowerCase().contains("icici")) {
         return CapturedNotificationType.ICICI_MESSAGE;
+      }
+      if (sender!.toLowerCase().contains("sbi") ||
+          content!.toLowerCase().contains("sbi")) {
+        return CapturedNotificationType.SBI_MESSAGE;
+      }
+      if (sender!.toLowerCase().contains("gpay") ||
+          content!.toLowerCase().contains("gpay")) {
+        return CapturedNotificationType.GPAY_MESSAGE;
       }
     }
     return CapturedNotificationType.UNKNOWN;
@@ -52,6 +84,7 @@ class CapturedNotification {
 
   bool isUnknown() => type == CapturedNotificationType.UNKNOWN;
 
+  //TODO: Refine
   double getAmount() {
     double result = -1;
     if (content == null) {
@@ -62,8 +95,13 @@ class CapturedNotification {
       case CapturedNotificationType.PAYTM_MESSAGE:
       case CapturedNotificationType.PHONEPE_MESSAGE:
       case CapturedNotificationType.ICICI_MESSAGE:
+      case CapturedNotificationType.SBI_MESSAGE:
+      case CapturedNotificationType.GPAY_MESSAGE:
       case CapturedNotificationType.PAYTM_NOTIF:
       case CapturedNotificationType.PHONEPE_NOTIF:
+      case CapturedNotificationType.ICICI_NOTIF:
+      case CapturedNotificationType.SBI_NOTIF:
+      case CapturedNotificationType.GPAY_NOTIF:
         for (String s in splits) {
           if (s.startsWith("Rs.")) {
             s = s.substring(3);
@@ -83,34 +121,35 @@ class CapturedNotification {
     return result;
   }
 
-  String getDescription(){
-    switch(type){
+  String getDescription() {
+    switch (type) {
       case CapturedNotificationType.PAYTM_MESSAGE:
       case CapturedNotificationType.PAYTM_NOTIF:
         return "From Paytm";
-        break;
       case CapturedNotificationType.PHONEPE_MESSAGE:
       case CapturedNotificationType.PHONEPE_NOTIF:
         return "From PhonePe";
       case CapturedNotificationType.ICICI_MESSAGE:
+      case CapturedNotificationType.ICICI_NOTIF:
         return "From ICICI";
+      case CapturedNotificationType.GPAY_MESSAGE:
+      case CapturedNotificationType.GPAY_NOTIF:
+        return "From GPay";
+      case CapturedNotificationType.SBI_MESSAGE:
+      case CapturedNotificationType.SBI_NOTIF:
+        return "From SBI";
       case CapturedNotificationType.UNKNOWN:
         return "Unknown Notification";
     }
   }
 
   //TODO: Refine
-  String getCategory(){
+  String getCategory() {
     return "Expense";
   }
 
   //TODO: Refine
-  ExpenseDirection getDirection(){
+  ExpenseDirection getDirection() {
     return ExpenseDirection.payment;
   }
 }
-
-/*@pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  // handle action
-}*/

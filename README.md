@@ -1,4 +1,4 @@
-# budget_manager_revamped
+# Budget-Manager-Revamped
 
 Budget Manager - revamped and more customizable than ever!
 
