@@ -48,14 +48,15 @@ Future<void> initializeNotificationService() async {
   );
 }
 
-Future<bool> getNecessaryPermissions() async{
-  while(!(await Permission.accessNotificationPolicy.request()).isGranted){
-    if((await Permission.accessNotificationPolicy.status).isPermanentlyDenied){
+Future<bool> getNecessaryPermissions() async {
+  while (!(await Permission.accessNotificationPolicy.request()).isGranted) {
+    if ((await Permission.accessNotificationPolicy.status)
+        .isPermanentlyDenied) {
       return false;
     }
   }
-  while(!(await Permission.sms.request()).isGranted){
-    if((await Permission.sms.status).isPermanentlyDenied){
+  while (!(await Permission.sms.request()).isGranted) {
+    if ((await Permission.sms.status).isPermanentlyDenied) {
       openAppSettings();
       return false;
     }
@@ -72,9 +73,11 @@ void dbEntryFunction() {
   _backgroundChannel.setMethodCallHandler((MethodCall call) async {
     try {
       final List<dynamic> args = call.arguments;
+      final String senderWithContent =
+          "${args[1] as String} ${args[2] as String}";
       CapturedNotification cn = CapturedNotification(
-          args[0] as String?, args[1] as String?, args[2] as String?);
-      if(cn.isUnknown()){
+          args[0] as String?, args[1] as String?, senderWithContent);
+      if (cn.isUnknown()) {
         return;
       }
       Expense newExpense = await insertExpenseFromCapturedNotification(cn);

@@ -130,8 +130,9 @@ class ExpenseItem extends StatelessWidget {
                 children: [
                   RowWidget("Amount: ${expense.amount}"),
                   RowWidget("Category: ${expense.category}"),
-                  if(expense.direction != ExpenseDirection.payment)
-                    RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
+                  if (expense.direction != ExpenseDirection.payment)
+                    RowWidget(
+                        "Type: ${toExpenseDirectionUIString(expense.direction)}"),
                   RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
                 ],
               ),
@@ -195,15 +196,15 @@ class ExpenseItem extends StatelessWidget {
   }
 
   void showExpenseDetailsDialog(BuildContext context) => showDialog<bool?>(
-    context: context,
-    barrierDismissible: false, // user must tap button!
-    builder: (BuildContext context) =>
-        ExpenseDetailsDialog(expense),
-  );
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) => ExpenseDetailsDialog(expense),
+      );
 }
 
-class ExpenseDetailsDialog extends StatelessWidget{
+class ExpenseDetailsDialog extends StatelessWidget {
   final Expense expense;
+
   const ExpenseDetailsDialog(this.expense);
 
   @override
@@ -216,7 +217,8 @@ class ExpenseDetailsDialog extends StatelessWidget{
           child: ListView(
             children: [
               RowWidget("Amount: ${expense.amount}"),
-              RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
+              RowWidget(
+                  "Type: ${toExpenseDirectionUIString(expense.direction)}"),
               RowWidget("Category: ${expense.category}"),
               RowWidget("Description: ${expense.description}"),
               RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
@@ -234,5 +236,4 @@ class ExpenseDetailsDialog extends StatelessWidget{
   }
 }
 
-//TODO: NotifReader
 //TODO: Drawer: AtAGlance,TrackRelativeChange,Sync

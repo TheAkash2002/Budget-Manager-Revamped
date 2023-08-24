@@ -29,66 +29,84 @@ class CapturedNotification {
     SBI_PACKAGE,
     GPAY_PACKAGE
   ];
+  static final phoneNumbers = ["7809601401", "9337198649"];
+  static const AMOUNT_THRESHOLD = 100000;
   final String? packageName;
   final String? sender;
   final String? content;
   late CapturedNotificationType type;
+  double? _amount;
 
   CapturedNotification(this.packageName, this.sender, this.content) {
-    type = findType();
-    if (type != CapturedNotificationType.UNKNOWN && getAmount() == -1) {
+    findType();
+  }
+
+  void findType() {
+    type = CapturedNotificationType.UNKNOWN;
+    if (packageName == PHONEPE_PACKAGE) {
+      type = CapturedNotificationType.PHONEPE_NOTIF;
+    } else if (packageName == PAYTM_PACKAGE) {
+      type = CapturedNotificationType.PAYTM_NOTIF;
+    } else if (packageName == GPAY_PACKAGE) {
+      type = CapturedNotificationType.GPAY_NOTIF;
+    } else if (packageName == ICICI_PACKAGE) {
+      type = CapturedNotificationType.ICICI_NOTIF;
+    } else if (packageName == SBI_PACKAGE) {
+      type = CapturedNotificationType.SBI_NOTIF;
+    } else if (sender != null) {
+      if (sender!.toLowerCase().contains("paytm") ||
+          content!.toLowerCase().contains("paytm")) {
+        type = CapturedNotificationType.PAYTM_MESSAGE;
+      } else if (sender!.toLowerCase().contains("phonepe") ||
+          content!.toLowerCase().contains("phonepe")) {
+        type = CapturedNotificationType.PHONEPE_MESSAGE;
+      } else if (sender!.toLowerCase().contains("icici") ||
+          content!.toLowerCase().contains("icici")) {
+        type = CapturedNotificationType.ICICI_MESSAGE;
+      } else if (sender!.toLowerCase().contains("sbi") ||
+          content!.toLowerCase().contains("sbi")) {
+        type = CapturedNotificationType.SBI_MESSAGE;
+      } else if (sender!.toLowerCase().contains("gpay") ||
+          content!.toLowerCase().contains("gpay")) {
+        type = CapturedNotificationType.GPAY_MESSAGE;
+      }
+    }
+
+    if (isAmountSuspicious()){
       type = CapturedNotificationType.UNKNOWN;
     }
   }
 
-  CapturedNotificationType findType() {
-    if (packageName == PHONEPE_PACKAGE) {
-      return CapturedNotificationType.PHONEPE_NOTIF;
+  bool isUnknown() => type == CapturedNotificationType.UNKNOWN;
+
+  bool isOtpMessage() =>
+      content != null && (content!.contains("OTP") || content!.contains("otp"));
+
+  bool containsPhoneNumber() {
+    if (content == null) return false;
+    bool containsPhone = false;
+    for (String phone in CapturedNotification.phoneNumbers) {
+      containsPhone |= content!.contains(phone);
     }
-    if (packageName == PAYTM_PACKAGE) {
-      return CapturedNotificationType.PAYTM_NOTIF;
-    }
-    if (packageName == GPAY_PACKAGE) {
-      return CapturedNotificationType.GPAY_NOTIF;
-    }
-    if (packageName == ICICI_PACKAGE) {
-      return CapturedNotificationType.ICICI_NOTIF;
-    }
-    if (packageName == SBI_PACKAGE) {
-      return CapturedNotificationType.SBI_NOTIF;
-    }
-    if (sender != null) {
-      if (sender!.toLowerCase().contains("paytm") ||
-          content!.toLowerCase().contains("paytm")) {
-        return CapturedNotificationType.PAYTM_MESSAGE;
-      }
-      if (sender!.toLowerCase().contains("phonepe") ||
-          content!.toLowerCase().contains("phonepe")) {
-        return CapturedNotificationType.PHONEPE_MESSAGE;
-      }
-      if (sender!.toLowerCase().contains("icici") ||
-          content!.toLowerCase().contains("icici")) {
-        return CapturedNotificationType.ICICI_MESSAGE;
-      }
-      if (sender!.toLowerCase().contains("sbi") ||
-          content!.toLowerCase().contains("sbi")) {
-        return CapturedNotificationType.SBI_MESSAGE;
-      }
-      if (sender!.toLowerCase().contains("gpay") ||
-          content!.toLowerCase().contains("gpay")) {
-        return CapturedNotificationType.GPAY_MESSAGE;
-      }
-    }
-    return CapturedNotificationType.UNKNOWN;
+    return containsPhone;
   }
 
-  bool isUnknown() => type == CapturedNotificationType.UNKNOWN;
+  bool isPayment() {
+    return !(isUnknown() ||
+        content == null ||
+        isOtpMessage() ||
+        containsPhoneNumber());
+  }
 
   //TODO: Refine
   double getAmount() {
+    if(_amount != null) {
+      return _amount!;
+    }
     double result = -1;
-    if (content == null) {
-      return result;
+    if (!isPayment()) {
+      _amount = result;
+      return _amount!;
     }
     final splits = content!.split(" ");
     switch (type) {
@@ -118,8 +136,11 @@ class CapturedNotification {
         result = -1;
         break;
     }
-    return result;
+    _amount = result;
+    return _amount!;
   }
+
+  bool isAmountSuspicious() => getAmount() == -1 || getAmount() >= AMOUNT_THRESHOLD;
 
   String getDescription() {
     switch (type) {
