@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/models.dart';
 import 'utils.dart';
@@ -80,8 +80,8 @@ Future<double> getTarget(DateTime dateTime) async {
 }
 
 Future<List<Target>> getAllTargets() async {
-  final List<Map<String, dynamic>> maps =
-      await (await getDatabase()).query(targetTableName, orderBy: "$colTargetDate DESC");
+  final List<Map<String, dynamic>> maps = await (await getDatabase())
+      .query(targetTableName, orderBy: "$colTargetDate DESC");
   return List.generate(maps.length, (i) {
     return Target.fromMap(maps[i]);
   });
@@ -104,8 +104,8 @@ Future<void> deleteTarget(int id) async {
   );
 }
 
-Future<void> insertExpense(Expense expense) async {
-  await (await getDatabase()).insert(
+Future<int> insertExpense(Expense expense) async {
+  return await (await getDatabase()).insert(
     expenseTableName,
     expense.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
@@ -113,8 +113,8 @@ Future<void> insertExpense(Expense expense) async {
 }
 
 Future<List<Expense>> getAllExpenses() async {
-  final List<Map<String, dynamic>> maps =
-      await (await getDatabase()).query(expenseTableName, orderBy: "$colExpenseDate DESC");
+  final List<Map<String, dynamic>> maps = await (await getDatabase())
+      .query(expenseTableName, orderBy: "$colExpenseDate DESC");
   return List.generate(maps.length, (i) {
     return Expense.fromMap(maps[i]);
   });

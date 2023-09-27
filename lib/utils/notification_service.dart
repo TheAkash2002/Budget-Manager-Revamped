@@ -13,14 +13,14 @@ final FlutterLocalNotificationsPlugin plugin =
     FlutterLocalNotificationsPlugin();
 int id = 0;
 const AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
-  'princeAkash/notifChannel',
-  'Channel',
-  channelDescription: 'NotifChannel',
-  importance: Importance.max,
-  priority: Priority.high,
-  ticker: 'ticker',
-);
+    AndroidNotificationDetails('princeAkash/notifChannel', 'Channel',
+        channelDescription: 'NotifChannel',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+        actions: <AndroidNotificationAction>[
+      AndroidNotificationAction("del", "Delete")
+    ]);
 const NotificationDetails notificationDetails =
     NotificationDetails(android: androidNotificationDetails);
 
@@ -38,14 +38,12 @@ Future<void> initializeNotificationService() async {
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
-  await plugin.initialize(
-    initializationSettings,
-    /*onDidReceiveNotificationResponse:
+  await plugin.initialize(initializationSettings,
+      /*onDidReceiveNotificationResponse:
         (NotificationResponse notificationResponse) async {
       // ...
-    },
-    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,*/
-  );
+    },*/
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 }
 
 Future<bool> getNecessaryPermissions() async {
@@ -80,9 +78,11 @@ void dbEntryFunction() {
       if (cn.isUnknown()) {
         return;
       }
-      Expense newExpense = await insertExpenseFromCapturedNotification(cn);
+      List values = await insertExpenseFromCapturedNotification(cn);
+      double amount = values[0] as double;
+      int newId = values[1] as int;
       dispatchNotification(
-          "Added expense: Rs.${newExpense.amount.toString()}", "Success!");
+          "Added expense: Rs.${amount.toString()}", "Success!", newId);
     } on Exception catch (e) {
       print(e);
     }
@@ -90,7 +90,14 @@ void dbEntryFunction() {
   _backgroundChannel.invokeMethod('NotificationPropagationService.initialized');
 }
 
-Future<Expense> insertExpenseFromCapturedNotification(
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse response) {
+  if (response.actionId == "del") {
+    deleteExpense(int.tryParse(response.payload!)!);
+  }
+}
+
+Future<List> insertExpenseFromCapturedNotification(
     CapturedNotification cn) async {
   DateTime current = DateTime.now();
   Expense newExpense = Expense(
@@ -102,11 +109,11 @@ Future<Expense> insertExpenseFromCapturedNotification(
     date: DateTime(current.year, current.month, current.day),
     lastEdit: DateTime.now(),
   );
-  await insertExpense(newExpense);
-  return newExpense;
+  int newId = await insertExpense(newExpense);
+  return [newExpense.amount, newId];
 }
 
-void dispatchNotification(String title, String message) async {
+void dispatchNotification(String title, String message, int newId) async {
   await plugin.show(id++, title, message, notificationDetails,
-      payload: 'item x');
+      payload: newId.toString());
 }
