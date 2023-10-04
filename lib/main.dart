@@ -1,14 +1,18 @@
 import 'package:budget_manager_revamped/controller/targets_controller.dart';
 import 'package:budget_manager_revamped/ui/targets.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'controller/expense_controller.dart';
+import 'firebase_options.dart';
 import 'ui/home.dart';
 import 'utils/notification_service.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
   initializeNotificationService();
 }

@@ -41,6 +41,7 @@ dependencies:
   fluttertoast: ^8.0.9
   flutter_local_notifications:
   permission_handler: ^10.4.3
+  firebase_core: ^2.17.0
 
 dev_dependencies:
   flutter_test:
