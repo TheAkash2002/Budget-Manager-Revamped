@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:budget_manager_revamped/ui/insert_edit_expense.dart';
-import 'package:budget_manager_revamped/utils/database_helper.dart';
+import 'package:budget_manager_revamped/db/database_helper.dart';
 import 'package:budget_manager_revamped/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

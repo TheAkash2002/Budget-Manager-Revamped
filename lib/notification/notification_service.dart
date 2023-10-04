@@ -1,13 +1,13 @@
 import 'dart:ui';
 
 import 'package:budget_manager_revamped/models/models.dart';
-import 'package:budget_manager_revamped/utils/notification_utils.dart';
+import 'package:budget_manager_revamped/notification/notification_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'database_helper.dart';
+import '../db/database_helper.dart';
 
 final FlutterLocalNotificationsPlugin plugin =
     FlutterLocalNotificationsPlugin();

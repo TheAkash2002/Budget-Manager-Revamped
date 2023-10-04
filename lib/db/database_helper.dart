@@ -2,7 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/models.dart';
-import 'utils.dart';
+import '../utils/utils.dart';
 
 const String expenseTableName = "expenses";
 const String colExpenseID = "ExpenseID";

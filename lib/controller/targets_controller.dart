@@ -1,4 +1,4 @@
-import 'package:budget_manager_revamped/utils/database_helper.dart';
+import 'package:budget_manager_revamped/db/database_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 

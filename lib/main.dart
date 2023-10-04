@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'controller/expense_controller.dart';
 import 'firebase_options.dart';
 import 'ui/home.dart';
-import 'utils/notification_service.dart';
+import 'notification/notification_service.dart';
 
 void main() async {
   await Firebase.initializeApp(
