@@ -16,9 +16,9 @@ class Login extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30)),
               elevation: 500,
               child: Padding(
-                padding: EdgeInsets.all(30),
+                padding: const EdgeInsets.all(30),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(
+                  const Text(
                     "Budget Manager - Revamped",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                   ),
@@ -26,7 +26,10 @@ class Login extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                     child: ElevatedButton(
                       onPressed: signIn,
-                      child: Padding(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(100, 50),
+                      ),
+                      child: const Padding(
                         padding: EdgeInsets.all(6),
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
@@ -37,9 +40,6 @@ class Login extends StatelessWidget {
                             Text('Sign in with Google'),
                           ],
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(100, 50),
                       ),
                     ),
                   ),

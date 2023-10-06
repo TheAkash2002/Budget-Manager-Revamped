@@ -5,25 +5,28 @@ import 'package:intl/intl.dart';
 import '../auth/auth.dart';
 import '../controller/targets_controller.dart';
 import '../models/models.dart';
-import '../ui/insert_edit_target.dart';
+import '../ui/insert_edit_target_dialog.dart';
 import '../utils/utils.dart';
+import 'delete_target_dialog.dart';
 
 class Targets extends StatelessWidget {
+  const Targets({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<TargetsController>(
       builder: (_) => Scaffold(
         appBar: AppBar(
           title: const Text("Monthly Targets"),
-          actions: [
+          actions: const [
             IconButton(
               onPressed: navigateToLoginPage,
-              icon: const Icon(Icons.logout),
+              icon: Icon(Icons.logout),
               tooltip: "Log Out",
             ),
           ],
         ),
-        drawer: NavDrawer(),
+        drawer: const NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
         body: StreamBuilder<List<Target>>(
             stream: _.targetStream,
@@ -59,7 +62,7 @@ class Targets extends StatelessWidget {
               );
             }),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => showCreateTargetDialog(context),
+          onPressed: showCreateTargetDialog,
           tooltip: "Create New Target",
           child: const Icon(Icons.add),
         ),
@@ -67,10 +70,10 @@ class Targets extends StatelessWidget {
     );
   }
 
-  void showCreateTargetDialog(BuildContext context) async {
+  void showCreateTargetDialog() {
     Get.find<TargetsController>().refreshInsertEditTargetControllers();
-    await showDialog<bool?>(
-      context: context,
+    showDialog<bool?>(
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
           const InsertEditTargetDialog(TargetDialogMode.insert),
@@ -84,7 +87,8 @@ class TargetItem extends StatelessWidget {
   final void Function(String) deleteTargetController;
 
   const TargetItem(
-      this.target, this.editTargetController, this.deleteTargetController);
+      this.target, this.editTargetController, this.deleteTargetController,
+      {super.key});
 
   /// Used to ensure that when any other synchronization operation or
   /// List-fetching operation is going on, any subsequent request for new
@@ -117,12 +121,12 @@ class TargetItem extends StatelessWidget {
               IconButton(
                 tooltip: 'Edit Target',
                 icon: const Icon(Icons.edit),
-                onPressed: () => showEditTargetDialog(context),
+                onPressed: showEditTargetDialog,
               ),
               IconButton(
                 tooltip: 'Delete Target',
                 icon: const Icon(Icons.delete),
-                onPressed: () => deleteTarget(context),
+                onPressed: deleteTarget,
               ),
             ],
           ),
@@ -131,25 +135,11 @@ class TargetItem extends StatelessWidget {
     );
   }
 
-  void deleteTarget(context) async {
+  void deleteTarget() async {
     bool? confirmDelete = await showDialog<bool?>(
-      context: context,
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
-      builder: (ctx) => AlertDialog(
-        title: const Text("Delete Target"),
-        content: const Text(
-            "Are you sure you want to delete this target? This action cannot be undone!"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.of(ctx).pop(false),
-          ),
-          TextButton(
-            child: const Text('Delete'),
-            onPressed: () => Navigator.of(ctx).pop(true),
-          ),
-        ],
-      ),
+      builder: (ctx) => const DeleteTargetDialog(),
     );
 
     if (confirmDelete != null && confirmDelete) {
@@ -157,10 +147,10 @@ class TargetItem extends StatelessWidget {
     }
   }
 
-  void showEditTargetDialog(BuildContext context) async {
+  void showEditTargetDialog() {
     Get.find<TargetsController>().instantiateEditTargetControllers(target);
-    await showDialog<bool?>(
-      context: context,
+    showDialog<bool?>(
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
           const InsertEditTargetDialog(TargetDialogMode.edit),

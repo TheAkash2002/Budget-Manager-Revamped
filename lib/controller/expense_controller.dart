@@ -6,7 +6,8 @@ import 'package:get/get.dart';
 import '../auth/auth.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
-import '../ui/insert_edit_expense.dart';
+import '../ui/confirm_insert_without_target_dialog.dart';
+import '../ui/insert_edit_expense_dialog.dart';
 import '../utils/utils.dart';
 
 class ExpenseController extends GetxController {
@@ -15,18 +16,13 @@ class ExpenseController extends GetxController {
       descriptionController;
   DateTime pickerDate = DateTime.now();
   ExpenseDirection expenseDirection = ExpenseDirection.payment;
-  late Stream<List<Expense>> paymentStream;
+  Stream<List<Expense>> paymentStream = const Stream<List<Expense>>.empty();
 
-  //late List<Expense> allExpenses;
-  late List<Expense> allPayments;
-  late List<Expense> allLoans;
   late List<String> allCategories;
 
   Expense? currentExpense;
 
   ExpenseController() {
-    allPayments = List.empty();
-    allLoans = List.empty();
     allCategories = List.empty();
     amountController = TextEditingController();
     categoryController = TextEditingController();
@@ -40,7 +36,7 @@ class ExpenseController extends GetxController {
     if (isLoggedIn()) {
       refreshExpenseStreamReference();
     } else {
-      signOut();
+      navigateToLoginPage();
     }
   }
 
@@ -49,8 +45,8 @@ class ExpenseController extends GetxController {
     update();
   }
 
-  void createExpense(context, ExpenseDialogMode mode) async {
-    if (await validateExpenseDialog(context, mode)) {
+  void createExpense(BuildContext context, ExpenseDialogMode mode) async {
+    if (await validateExpenseDialog(mode)) {
       Expense newExpense = Expense(
         id: "",
         amount: double.tryParse(amountController.text)!,
@@ -61,14 +57,16 @@ class ExpenseController extends GetxController {
         lastEdit: DateTime.now(),
       );
       await insertExpense(newExpense);
-      Navigator.of(context).pop(true);
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
       showToast("Inserted expense successfully!");
       //refreshExpensesList();
     }
   }
 
   void editExpense(BuildContext context, ExpenseDialogMode mode) async {
-    if (await validateExpenseDialog(context, mode)) {
+    if (await validateExpenseDialog(mode)) {
       currentExpense!.amount = double.tryParse(amountController.text)!;
       currentExpense!.category = categoryController.text;
       currentExpense!.description = descriptionController.text;
@@ -76,7 +74,9 @@ class ExpenseController extends GetxController {
       currentExpense!.date = pickerDate;
       currentExpense!.lastEdit = DateTime.now();
       await updateExpense(currentExpense!);
-      Navigator.of(context).pop(true);
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
       showToast("Updated expense successfully!");
       //refreshExpensesList();
     }
@@ -96,8 +96,7 @@ class ExpenseController extends GetxController {
     allCategories = await getExistingCategoriesList();
   }
 
-  Future<bool> validateExpenseDialog(
-      BuildContext context, ExpenseDialogMode mode) async {
+  Future<bool> validateExpenseDialog(ExpenseDialogMode mode) async {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
       showToast("Enter valid amount!");
@@ -116,23 +115,9 @@ class ExpenseController extends GetxController {
 
     if (!(await isTargetSet(pickerDate))) {
       bool? confirmInsertWithoutTarget = await showDialog<bool?>(
-        context: context,
+        context: Get.context!,
         barrierDismissible: false, // user must tap button!
-        builder: (ctx) => AlertDialog(
-          title: const Text("Insert Without Target"),
-          content: const Text(
-              "The target for the given month is not inserted. Are you sure you want to insert an expense for the given date?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => Navigator.of(ctx).pop(false),
-            ),
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () => Navigator.of(ctx).pop(true),
-            ),
-          ],
-        ),
+        builder: (ctx) => const ConfirmInsertWithoutTargetDialog(),
       );
 
       return (confirmInsertWithoutTarget != null && confirmInsertWithoutTarget);
@@ -153,7 +138,7 @@ class ExpenseController extends GetxController {
 
     if (overrideAmount > 0) {
       bool? confirmTargetOverride = await showDialog<bool?>(
-        context: context,
+        context: Get.context!,
         barrierDismissible: false, // user must tap button!
         builder: (ctx) => AlertDialog(
           title: const Text("Target Override"),

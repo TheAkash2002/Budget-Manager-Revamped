@@ -5,10 +5,13 @@ import 'package:intl/intl.dart';
 import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
 import '../models/models.dart';
-import '../ui/insert_edit_expense.dart';
+import '../ui/insert_edit_expense_dialog.dart';
 import '../utils/utils.dart';
+import 'delete_expense_dialog.dart';
 
 class Home extends StatelessWidget {
+  const Home({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExpenseController>(
@@ -23,7 +26,7 @@ class Home extends StatelessWidget {
             ),
           ],
         ),
-        drawer: NavDrawer(),
+        drawer: const NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
         body: StreamBuilder<List<Expense>>(
             stream: _.paymentStream,
@@ -53,7 +56,7 @@ class Home extends StatelessWidget {
               );
             }),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => showCreateExpenseDialog(context),
+          onPressed: showCreateExpenseDialog,
           tooltip: "Create New Expense",
           child: const Icon(Icons.add),
         ),
@@ -61,10 +64,10 @@ class Home extends StatelessWidget {
     );
   }
 
-  void showCreateExpenseDialog(BuildContext context) async {
+  void showCreateExpenseDialog() async {
     await Get.find<ExpenseController>().refreshInsertEditExpenseControllers();
-    await showDialog<bool?>(
-      context: context,
+    showDialog<bool?>(
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
           InsertEditExpenseDialog(ExpenseDialogMode.insert),
@@ -78,7 +81,8 @@ class ExpenseItem extends StatelessWidget {
   final void Function(String) deleteExpenseController;
 
   const ExpenseItem(
-      this.expense, this.editExpenseController, this.deleteExpenseController);
+      this.expense, this.editExpenseController, this.deleteExpenseController,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +92,7 @@ class ExpenseItem extends StatelessWidget {
           Expanded(
             flex: 1,
             child: InkWell(
-              onTap: () => showExpenseDetailsDialog(context),
+              onTap: showExpenseDetailsDialog,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -107,12 +111,12 @@ class ExpenseItem extends StatelessWidget {
               IconButton(
                 tooltip: 'Edit Expense',
                 icon: const Icon(Icons.edit),
-                onPressed: () => showEditExpenseDialog(context),
+                onPressed: showEditExpenseDialog,
               ),
               IconButton(
                 tooltip: 'Delete Expense',
                 icon: const Icon(Icons.delete),
-                onPressed: () => deleteExpense(context),
+                onPressed: deleteExpense,
               ),
             ],
           ),
@@ -121,25 +125,11 @@ class ExpenseItem extends StatelessWidget {
     );
   }
 
-  void deleteExpense(context) async {
+  void deleteExpense() async {
     bool? confirmDelete = await showDialog<bool?>(
-      context: context,
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
-      builder: (ctx) => AlertDialog(
-        title: const Text("Delete Expense"),
-        content: const Text(
-            "Are you sure you want to delete this expense? This action cannot be undone!"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.of(ctx).pop(false),
-          ),
-          TextButton(
-            child: const Text('Delete'),
-            onPressed: () => Navigator.of(ctx).pop(true),
-          ),
-        ],
-      ),
+      builder: (ctx) => const DeleteExpenseDialog(),
     );
 
     if (confirmDelete != null && confirmDelete) {
@@ -147,19 +137,19 @@ class ExpenseItem extends StatelessWidget {
     }
   }
 
-  void showEditExpenseDialog(BuildContext context) async {
+  void showEditExpenseDialog() async {
     await Get.find<ExpenseController>()
         .instantiateEditExpenseControllers(expense);
-    await showDialog<bool?>(
-      context: context,
+    showDialog<bool?>(
+      context: Get.context!,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
           InsertEditExpenseDialog(ExpenseDialogMode.edit),
     );
   }
 
-  void showExpenseDetailsDialog(BuildContext context) => showDialog<bool?>(
-        context: context,
+  void showExpenseDetailsDialog() => showDialog<bool?>(
+        context: Get.context!,
         barrierDismissible: false, // user must tap button!
         builder: (BuildContext context) => ExpenseDetailsDialog(expense),
       );
@@ -173,7 +163,7 @@ class ExpenseDetailsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Details"),
+      title: const Text("Details"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

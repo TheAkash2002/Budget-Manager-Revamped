@@ -54,7 +54,9 @@ class TargetsController extends GetxController {
         lastEdit: DateTime.now(),
       );
       await insertTarget(newTarget);
-      Navigator.of(context).pop(true);
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
       showToast("Inserted target successfully!");
       //refreshTargetsList();
     }
@@ -66,7 +68,9 @@ class TargetsController extends GetxController {
       currentTarget!.date = getFirstDayOfMonth(pickerDate);
       currentTarget!.lastEdit = DateTime.now();
       await updateTarget(currentTarget!);
-      Navigator.of(context).pop(true);
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
       showToast("Updated target successfully!");
       //refreshTargetsList();
     }

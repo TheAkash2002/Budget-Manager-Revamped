@@ -6,9 +6,9 @@ import 'controller/expense_controller.dart';
 import 'controller/targets_controller.dart';
 import 'firebase_options.dart';
 import 'notification/notification_service.dart';
-import 'ui/home.dart';
-import 'ui/login.dart';
-import 'ui/targets.dart';
+import 'ui/home_page.dart';
+import 'ui/login_page.dart';
+import 'ui/targets_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Budget Manager - Revamped',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
       initialRoute: '/',
       getPages: [
@@ -37,14 +37,14 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/',
-          page: () => Home(),
+          page: () => const Home(),
           binding: BindingsBuilder(() {
             Get.put<ExpenseController>(ExpenseController());
           }),
         ),
         GetPage(
           name: '/targets',
-          page: () => Targets(),
+          page: () => const Targets(),
           binding: BindingsBuilder(() {
             Get.put<TargetsController>(TargetsController());
           }),

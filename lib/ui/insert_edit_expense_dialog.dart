@@ -13,7 +13,7 @@ class InsertEditExpenseDialog extends StatelessWidget {
   final GlobalKey autocompleteKey = GlobalKey();
   final FocusNode focusNode = FocusNode();
 
-  InsertEditExpenseDialog(this.mode);
+  InsertEditExpenseDialog(this.mode, {super.key});
 
   String getTitleFromMode() {
     return mode == ExpenseDialogMode.insert ? "Create Expense" : "Edit Expense";
@@ -24,15 +24,19 @@ class InsertEditExpenseDialog extends StatelessWidget {
     return GetBuilder<ExpenseController>(
       builder: (_) => AlertDialog(
         title: Text(getTitleFromMode()),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView(
-            //mainAxisSize: MainAxisSize.min,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                autofocus: true,
-                controller: _.amountController,
-                decoration: const InputDecoration(hintText: "Amount"),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                child: TextField(
+                  autofocus: true,
+                  controller: _.amountController,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), labelText: "Amount"),
+                ),
               ),
               RawAutocomplete<String>(
                 key: autocompleteKey,
@@ -60,27 +64,42 @@ class InsertEditExpenseDialog extends StatelessWidget {
                 ),
                 optionsBuilder: (value) => _.allCategories.where((element) =>
                     element.toLowerCase().contains(value.text.toLowerCase())),
-                fieldViewBuilder: (ctx, tex, focusNode, fun) => TextFormField(
-                  focusNode: focusNode,
-                  controller: tex,
-                  decoration: const InputDecoration(hintText: "Category"),
+                fieldViewBuilder: (ctx, tex, focusNode, fun) => Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                  child: TextField(
+                    focusNode: focusNode,
+                    controller: tex,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(), labelText: "Category"),
+                  ),
                 ),
               ),
-              TextFormField(
-                autofocus: true,
-                controller: _.descriptionController,
-                decoration: const InputDecoration(hintText: "Description"),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                child: TextField(
+                  autofocus: true,
+                  controller: _.descriptionController,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), labelText: "Description"),
+                ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
                 child: GestureDetector(
                   onTap: () =>
                       openDatePicker(context, _.pickerDate, _.setPickerDate),
-                  child: Text(DateFormat.yMMMd().format(_.pickerDate)),
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(), labelText: "Date"),
+                    child: Text(DateFormat.yMMMd().format(_.pickerDate)),
+                  ),
                 ),
               ),
-              const Text("Direction:"),
+              const Text(
+                "Direction:",
+                textAlign: TextAlign.start,
+              ),
               ...(ExpenseDirection.values.map<ListTile>((e) => ListTile(
                     title: Text(toExpenseDirectionString(e)),
                     leading: Radio<ExpenseDirection>(

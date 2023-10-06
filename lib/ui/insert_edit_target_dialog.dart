@@ -10,7 +10,7 @@ enum TargetDialogMode { insert, edit }
 class InsertEditTargetDialog extends StatelessWidget {
   final TargetDialogMode mode;
 
-  const InsertEditTargetDialog(this.mode);
+  const InsertEditTargetDialog(this.mode, {super.key});
 
   String getTitleFromMode() {
     return mode == TargetDialogMode.insert ? "Create Target" : "Edit Target";
@@ -21,27 +21,31 @@ class InsertEditTargetDialog extends StatelessWidget {
     return GetBuilder<TargetsController>(
       builder: (_) => AlertDialog(
         title: Text(getTitleFromMode()),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView(
-            //mainAxisSize: MainAxisSize.min,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
+              TextField(
                 autofocus: true,
                 controller: _.amountController,
-                decoration: const InputDecoration(hintText: "Amount"),
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), labelText: "Amount"),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: GestureDetector(
+              Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                  child: GestureDetector(
                     onTap: () {
                       if (mode == TargetDialogMode.insert) {
                         openDatePicker(context, _.pickerDate, _.setPickerDate);
                       }
                     },
-                    child: Text("${DateFormat.yM().format(_.pickerDate)}")),
-              ),
+                    child: InputDecorator(
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(), labelText: "Month"),
+                        child: Text(DateFormat.yMMMM().format(_.pickerDate))),
+                  )),
             ],
           ),
         ),

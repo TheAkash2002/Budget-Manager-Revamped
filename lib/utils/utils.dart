@@ -7,7 +7,7 @@ void showToast(String message) {
     message,
     "",
     colorText: Colors.white,
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Theme.of(Get.context!).colorScheme.primary,
     icon: const Icon(Icons.add_alert),
   );
   // FToast fToast = FToast();
@@ -78,17 +78,19 @@ DateTime getLastDayOfMonth(DateTime dateTime) {
 }
 
 class NavDrawer extends StatelessWidget {
+  const NavDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
         child: ListView(
       padding: EdgeInsets.zero,
       children: [
-        const DrawerHeader(
+        DrawerHeader(
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          child: Text('Drawer Header'),
+          child: const Text('Drawer Header'),
         ),
         ListTile(
           title: const Text('Expenses'),
