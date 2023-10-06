@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'controller/expense_controller.dart';
 import 'controller/targets_controller.dart';
@@ -26,9 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Budget Manager - Revamped',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
+      theme: _themeData(),
       initialRoute: '/',
       getPages: [
         GetPage(
@@ -51,5 +50,13 @@ class MyApp extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  ThemeData _themeData() {
+    var baseTheme = ThemeData(
+      primarySwatch: Colors.deepPurple,
+    );
+    return baseTheme.copyWith(
+        textTheme: GoogleFonts.latoTextTheme(baseTheme.textTheme));
   }
 }

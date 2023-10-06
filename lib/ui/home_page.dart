@@ -175,7 +175,7 @@ class ExpenseDetailsDialog extends StatelessWidget {
         ],
       ),
       actions: <Widget>[
-        TextButton(
+        ElevatedButton(
           child: const Text('Dismiss'),
           onPressed: () => Navigator.of(context).pop(),
         ),

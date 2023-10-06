@@ -14,7 +14,7 @@ class DeleteExpenseDialog extends StatelessWidget {
           child: const Text('Cancel'),
           onPressed: () => Navigator.of(context).pop(false),
         ),
-        TextButton(
+        ElevatedButton(
           child: const Text('Delete'),
           onPressed: () => Navigator.of(context).pop(true),
         ),

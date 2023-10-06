@@ -14,7 +14,7 @@ class ConfirmInsertWithoutTargetDialog extends StatelessWidget {
           child: const Text('No'),
           onPressed: () => Navigator.of(context).pop(false),
         ),
-        TextButton(
+        ElevatedButton(
           child: const Text('Yes'),
           onPressed: () => Navigator.of(context).pop(true),
         ),

@@ -116,7 +116,7 @@ class InsertEditExpenseDialog extends StatelessWidget {
             child: const Text('Cancel'),
             onPressed: () => Navigator.of(context).pop(false),
           ),
-          TextButton(
+          ElevatedButton(
             child: const Text('Submit'),
             onPressed: () => (mode == ExpenseDialogMode.insert
                 ? _.createExpense(context, mode)
