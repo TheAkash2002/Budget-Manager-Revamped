@@ -1,15 +1,17 @@
-import 'package:budget_manager_revamped/controller/targets_controller.dart';
-import 'package:budget_manager_revamped/ui/targets.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'controller/expense_controller.dart';
+import 'controller/targets_controller.dart';
 import 'firebase_options.dart';
-import 'ui/home.dart';
 import 'notification/notification_service.dart';
+import 'ui/home.dart';
+import 'ui/login.dart';
+import 'ui/targets.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -27,7 +29,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      initialRoute: '/login',
       getPages: [
+        GetPage(
+          name: '/login',
+          page: () => const Login(),
+        ),
         GetPage(
           name: '/',
           page: () => Home(),

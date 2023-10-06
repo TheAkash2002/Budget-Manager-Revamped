@@ -1,36 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 /// Utility to display [message] as a toast.
-void showToast(String message, BuildContext context) {
-  FToast fToast = FToast();
-  fToast.init(context);
-  Widget toast = Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(25.0),
-      color: Colors.greenAccent,
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.check),
-        const SizedBox(width: 12.0),
-        Text(message),
-      ],
-    ),
+void showToast(String message) {
+  Get.snackbar(
+    message,
+    "",
+    colorText: Colors.white,
+    backgroundColor: Colors.lightBlue,
+    icon: const Icon(Icons.add_alert),
   );
-  fToast.showToast(
-    child: toast,
-    gravity: ToastGravity.BOTTOM,
-    toastDuration: const Duration(seconds: 2),
-  );
+  // FToast fToast = FToast();
+  // fToast.init(context);
+  // Widget toast = Container(
+  //   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+  //   decoration: BoxDecoration(
+  //     borderRadius: BorderRadius.circular(25.0),
+  //     color: Colors.greenAccent,
+  //   ),
+  //   child: Row(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       const Icon(Icons.check),
+  //       const SizedBox(width: 12.0),
+  //       Text(message),
+  //     ],
+  //   ),
+  // );
+  // fToast.showToast(
+  //   child: toast,
+  //   gravity: ToastGravity.BOTTOM,
+  //   toastDuration: const Duration(seconds: 2),
+  // );
 }
 
 /// Opens a [DatePicker] widget.
-void openDatePicker(BuildContext context, DateTime initialDate, void Function(DateTime) callback) async {
-  try{
+void openDatePicker(BuildContext context, DateTime initialDate,
+    void Function(DateTime) callback) async {
+  try {
     final DateTime? newDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -40,8 +47,8 @@ void openDatePicker(BuildContext context, DateTime initialDate, void Function(Da
     if (newDate != null) {
       callback(newDate);
     }
-  }catch(_){
-    showToast("There was an error in capturing the date.", context);
+  } catch (_) {
+    showToast("There was an error in capturing the date.");
   }
 }
 
@@ -64,40 +71,38 @@ class RowWidget extends StatelessWidget {
   }
 }
 
-DateTime getFirstDayOfMonth(DateTime dateTime){
+DateTime getFirstDayOfMonth(DateTime dateTime) {
   return DateTime(dateTime.year, dateTime.month);
 }
 
-DateTime getLastDayOfMonth(DateTime dateTime){
-  return DateTime(dateTime.year, dateTime.month+1, 0);
+DateTime getLastDayOfMonth(DateTime dateTime) {
+  return DateTime(dateTime.year, dateTime.month + 1, 0);
 }
 
-class NavDrawer extends StatelessWidget{
+class NavDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text('Drawer Header'),
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        const DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.blue,
           ),
-          ListTile(
-            title: const Text('Expenses'),
-            tileColor: Get.currentRoute == '/' ? Colors.grey[300] : null,
-            onTap: () => Get.offAllNamed('/'),
-          ),
-          ListTile(
-            title: const Text('Targets'),
-            tileColor: Get.currentRoute == '/targets' ? Colors.grey[300] : null,
-            onTap: () => Get.offAllNamed('/targets'),
-          ),
-        ],
-      )
-    );
+          child: Text('Drawer Header'),
+        ),
+        ListTile(
+          title: const Text('Expenses'),
+          tileColor: Get.currentRoute == '/' ? Colors.grey[300] : null,
+          onTap: () => Get.offAllNamed('/'),
+        ),
+        ListTile(
+          title: const Text('Targets'),
+          tileColor: Get.currentRoute == '/targets' ? Colors.grey[300] : null,
+          onTap: () => Get.offAllNamed('/targets'),
+        ),
+      ],
+    ));
   }
-
 }

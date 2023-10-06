@@ -1,15 +1,14 @@
-import 'package:budget_manager_revamped/ui/insert_edit_target.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:intl/intl.dart';
 
+import '../auth/auth.dart';
 import '../controller/targets_controller.dart';
 import '../models/models.dart';
+import '../ui/insert_edit_target.dart';
 import '../utils/utils.dart';
 
-class Targets extends StatelessWidget{
+class Targets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<TargetsController>(
@@ -26,35 +25,47 @@ class Targets extends StatelessWidget{
         ),
         drawer: NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          child: RefreshIndicator(
-            onRefresh: _.refreshTargetsList,
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: ListView.builder(
-                    itemCount: _.allTargets.length,
-                    itemBuilder: (context, index) => TargetItem(
-                        _.allTargets[index], _.editTarget, _.removeTarget),
+        body: StreamBuilder<List<Target>>(
+            stream: _.targetStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasError || !snapshot.hasData) {
+                print("Error!");
+                print(snapshot.error);
+                return const Text("Error");
+              }
+              if (!snapshot.hasData) {
+                print("No data!");
+                return const Text("No data!");
+              }
+              return Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                child: RefreshIndicator(
+                  onRefresh: _.refreshTargetStreamReference,
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) => TargetItem(
+                              snapshot.data![index],
+                              _.editTarget,
+                              _.removeTarget),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+              );
+            }),
         floatingActionButton: FloatingActionButton(
           onPressed: () => showCreateTargetDialog(context),
-          child: const Icon(Icons.add),
           tooltip: "Create New Target",
+          child: const Icon(Icons.add),
         ),
       ),
     );
   }
-
-  //TODO: Complete Logout Flow
-  void navigateToLoginPage() {}
 
   void showCreateTargetDialog(BuildContext context) async {
     Get.find<TargetsController>().refreshInsertEditTargetControllers();
@@ -62,7 +73,7 @@ class Targets extends StatelessWidget{
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
-      const InsertEditTargetDialog(TargetDialogMode.insert),
+          const InsertEditTargetDialog(TargetDialogMode.insert),
     );
   }
 }
@@ -70,7 +81,7 @@ class Targets extends StatelessWidget{
 class TargetItem extends StatelessWidget {
   final Target target;
   final void Function(BuildContext) editTargetController;
-  final void Function(int) deleteTargetController;
+  final void Function(String) deleteTargetController;
 
   const TargetItem(
       this.target, this.editTargetController, this.deleteTargetController);
@@ -126,7 +137,8 @@ class TargetItem extends StatelessWidget {
       barrierDismissible: false, // user must tap button!
       builder: (ctx) => AlertDialog(
         title: const Text("Delete Target"),
-        content: const Text("Are you sure you want to delete this target? This action cannot be undone!"),
+        content: const Text(
+            "Are you sure you want to delete this target? This action cannot be undone!"),
         actions: <Widget>[
           TextButton(
             child: const Text('Cancel'),
@@ -140,7 +152,7 @@ class TargetItem extends StatelessWidget {
       ),
     );
 
-    if(confirmDelete != null && confirmDelete){
+    if (confirmDelete != null && confirmDelete) {
       deleteTargetController(target.id);
     }
   }
@@ -151,7 +163,7 @@ class TargetItem extends StatelessWidget {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
-      const InsertEditTargetDialog(TargetDialogMode.edit),
+          const InsertEditTargetDialog(TargetDialogMode.edit),
     );
   }
 }

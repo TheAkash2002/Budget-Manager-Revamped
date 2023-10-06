@@ -1,10 +1,25 @@
-import 'package:budget_manager_revamped/db/database_helper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ExpenseDirection { payment, loan_credit, loan_debit }
 
 const String PAYMENT = "PAYMENT";
 const String LOAN_CREDIT = "LOAN_CREDIT";
 const String LOAN_DEBIT = "LOAN_DEBIT";
+
+const String colExpenseID = "ExpenseID";
+const String colExpenseAmount = "Amount";
+const String colExpenseCategory = "Category";
+const String colExpenseDescription = "Description";
+const String colExpenseDirection = "Direction";
+const String colExpenseDate = "Date";
+const String colExpenseLastEdit = "LastEdit";
+const String colExpenseUUID = "ExpenseUUID";
+
+const String colTargetID = "TargetID";
+const String colTargetAmount = "Amount";
+const String colTargetDate = "Date";
+const String colTargetLastEdit = "LastEdit";
+const String colTargetUUID = "TargetUUID";
 
 String toExpenseDirectionString(ExpenseDirection direction) {
   switch (direction) {
@@ -50,7 +65,7 @@ ExpenseDirection fromExpenseDirectionString(String direction) {
 }
 
 class Expense {
-  int id;
+  String id;
   double amount;
   String category;
   String description;
@@ -68,28 +83,30 @@ class Expense {
       required this.date,
       required this.lastEdit});
 
-  Map<String, dynamic> toMap() {
+  static Map<String, dynamic> toMap(Expense expense) {
     Map<String, dynamic> res = {
       //colExpenseID: id,
-      colExpenseAmount: amount,
-      colExpenseDescription: description,
-      colExpenseCategory: category,
-      colExpenseDirection: toExpenseDirectionString(direction),
-      colExpenseDate: date.toIso8601String(),
-      colExpenseLastEdit: lastEdit.toIso8601String(),
+      colExpenseAmount: expense.amount,
+      colExpenseDescription: expense.description,
+      colExpenseCategory: expense.category,
+      colExpenseDirection: toExpenseDirectionString(expense.direction),
+      colExpenseDate: expense.date.toIso8601String(),
+      colExpenseLastEdit: expense.lastEdit.toIso8601String(),
     };
 
-    if (uuid != null) {
-      res[colExpenseUUID] = uuid;
+    if (expense.uuid != null) {
+      res[colExpenseUUID] = expense.uuid;
     }
 
     return res;
   }
 
-  static Expense fromMap(Map<String, dynamic> map) {
+  static Expense fromMap(DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? options) {
+    final map = snapshot.data()!;
     Expense res = Expense(
-      id: map[colExpenseID],
-      amount: map[colExpenseAmount],
+      id: snapshot.id,
+      amount: double.parse(map[colExpenseAmount].toString()),
       category: map[colExpenseCategory],
       description: map[colExpenseDescription],
       direction: fromExpenseDirectionString(map[colExpenseDirection]),
@@ -101,10 +118,14 @@ class Expense {
     }
     return res;
   }
+
+  static Expense fromQDS(QueryDocumentSnapshot<Expense> qds) {
+    return qds.data();
+  }
 }
 
 class Target {
-  int id;
+  String id;
   double amount;
   DateTime date;
   DateTime lastEdit;
@@ -117,23 +138,25 @@ class Target {
       required this.lastEdit,
       this.uuid});
 
-  Map<String, dynamic> toMap() {
+  static Map<String, dynamic> toMap(Target target) {
     Map<String, dynamic> res = {
       //colTargetID: id,
-      colTargetAmount: amount,
-      colTargetDate: date.toIso8601String(),
-      colTargetLastEdit: lastEdit.toIso8601String(),
+      colTargetAmount: target.amount,
+      colTargetDate: target.date.toIso8601String(),
+      colTargetLastEdit: target.lastEdit.toIso8601String(),
     };
-    if (uuid != null) {
-      res[colTargetUUID] = uuid;
+    if (target.uuid != null) {
+      res[colTargetUUID] = target.uuid;
     }
     return res;
   }
 
-  static Target fromMap(Map<String, dynamic> map) {
+  static Target fromMap(DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? options) {
+    final map = snapshot.data()!;
     Target res = Target(
-      id: map[colTargetID],
-      amount: map[colTargetAmount],
+      id: snapshot.id,
+      amount: double.parse(map[colTargetAmount].toString()),
       date: DateTime.parse(map[colTargetDate]),
       lastEdit: DateTime.parse(map[colTargetLastEdit]),
     );
@@ -141,5 +164,9 @@ class Target {
       res.uuid = map[colExpenseUUID];
     }
     return res;
+  }
+
+  static Target fromQDS(QueryDocumentSnapshot<Target> qds) {
+    return qds.data();
   }
 }

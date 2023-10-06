@@ -1,13 +1,15 @@
 import 'dart:ui';
 
-import 'package:budget_manager_revamped/models/models.dart';
-import 'package:budget_manager_revamped/notification/notification_utils.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../db/database_helper.dart';
+import '../db/firestore_helper.dart';
+import '../firebase_options.dart';
+import '../models/models.dart';
+import '../notification/notification_utils.dart';
 
 final FlutterLocalNotificationsPlugin plugin =
     FlutterLocalNotificationsPlugin();
@@ -63,13 +65,15 @@ Future<bool> getNecessaryPermissions() async {
 }
 
 @pragma('vm:entry-point')
-void dbEntryFunction() {
+void dbEntryFunction() async {
   const MethodChannel _backgroundChannel =
       MethodChannel('princeAkash/background');
   WidgetsFlutterBinding.ensureInitialized();
-
   _backgroundChannel.setMethodCallHandler((MethodCall call) async {
     try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       final List<dynamic> args = call.arguments;
       final String senderWithContent =
           "${args[1] as String} ${args[2] as String}";
@@ -80,9 +84,11 @@ void dbEntryFunction() {
       }
       List values = await insertExpenseFromCapturedNotification(cn);
       double amount = values[0] as double;
-      int newId = values[1] as int;
-      dispatchNotification(
-          "Added expense: Rs.${amount.toString()}", "Success!", newId);
+      String newId = values[1];
+      if (newId.isNotEmpty) {
+        dispatchNotification(
+            "Added expense: Rs.${amount.toString()}", "Success!", newId);
+      }
     } on Exception catch (e) {
       print(e);
     }
@@ -91,9 +97,13 @@ void dbEntryFunction() {
 }
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse response) {
+void notificationTapBackground(NotificationResponse response) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   if (response.actionId == "del") {
-    deleteExpense(int.tryParse(response.payload!)!);
+    deleteExpense(response.payload!);
   }
 }
 
@@ -101,7 +111,7 @@ Future<List> insertExpenseFromCapturedNotification(
     CapturedNotification cn) async {
   DateTime current = DateTime.now();
   Expense newExpense = Expense(
-    id: 0,
+    id: "",
     amount: cn.getAmount(),
     category: cn.getCategory(),
     description: cn.getDescription(),
@@ -109,11 +119,10 @@ Future<List> insertExpenseFromCapturedNotification(
     date: DateTime(current.year, current.month, current.day),
     lastEdit: DateTime.now(),
   );
-  int newId = await insertExpense(newExpense);
+  String newId = await insertExpense(newExpense);
   return [newExpense.amount, newId];
 }
 
-void dispatchNotification(String title, String message, int newId) async {
-  await plugin.show(id++, title, message, notificationDetails,
-      payload: newId.toString());
+void dispatchNotification(String title, String message, String newId) async {
+  await plugin.show(id++, title, message, notificationDetails, payload: newId);
 }

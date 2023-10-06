@@ -1,11 +1,12 @@
-import 'package:budget_manager_revamped/controller/expense_controller.dart';
-import 'package:budget_manager_revamped/ui/insert_edit_expense.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../auth/auth.dart';
+import '../controller/expense_controller.dart';
 import '../controller/tab_controller.dart';
 import '../models/models.dart';
+import '../ui/insert_edit_expense.dart';
 import '../utils/utils.dart';
 
 class Home extends StatelessWidget {
@@ -31,36 +32,38 @@ class Home extends StatelessWidget {
         ),
         drawer: NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
-        body: TabBarView(
-          controller: _tabx.controller,
-          children: _tabx.myTabs
-              .map((tab) => Padding(
-                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                    child: RefreshIndicator(
-                      onRefresh: _.refreshExpensesList,
-                      child: Stack(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(15),
-                            child: ListView.builder(
-                              itemCount: (tab.text == 'Payments'
-                                      ? _.allPayments
-                                      : _.allLoans)
-                                  .length,
-                              itemBuilder: (context, index) => ExpenseItem(
-                                  (tab.text == 'Payments'
-                                      ? _.allPayments
-                                      : _.allLoans)[index],
-                                  _.editExpense,
-                                  _.removeExpense),
+        body: StreamBuilder<List<Expense>>(
+            stream: _.paymentStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasError || !snapshot.hasData) {
+                return const Text("Couldn't load");
+              }
+              return TabBarView(
+                controller: _tabx.controller,
+                children: _tabx.myTabs
+                    .map((tab) => Padding(
+                          padding:
+                              const EdgeInsets.only(left: 10.0, right: 10.0),
+                          child: RefreshIndicator(
+                            onRefresh: () async {},
+                            child: Stack(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(15),
+                                  child: ListView.builder(
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) =>
+                                        ExpenseItem(snapshot.data![index],
+                                            _.editExpense, _.removeExpense),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ))
-              .toList(),
-        ),
+                        ))
+                    .toList(),
+              );
+            }),
         floatingActionButton: FloatingActionButton(
           onPressed: () => showCreateExpenseDialog(context),
           child: const Icon(Icons.add),
@@ -69,9 +72,6 @@ class Home extends StatelessWidget {
       ),
     );
   }
-
-  //TODO: Complete Logout Flow
-  void navigateToLoginPage() {}
 
   void showCreateExpenseDialog(BuildContext context) async {
     await Get.find<ExpenseController>().refreshInsertEditExpenseControllers();
@@ -82,39 +82,15 @@ class Home extends StatelessWidget {
           InsertEditExpenseDialog(ExpenseDialogMode.insert),
     );
   }
-
-  /// Opens [LoginPage] after a logout operation.
-/*void navigateToLoginPage() async {
-    try {
-      setLoadingState(true);
-      await FirebaseAuth.instance.signOut();
-      setLoadingState(false);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    } catch (_) {
-      showToast("There was an error in logging the user out.");
-    }
-  }*/
 }
 
 class ExpenseItem extends StatelessWidget {
   final Expense expense;
   final void Function(BuildContext, ExpenseDialogMode) editExpenseController;
-  final void Function(int) deleteExpenseController;
+  final void Function(String) deleteExpenseController;
 
   const ExpenseItem(
       this.expense, this.editExpenseController, this.deleteExpenseController);
-
-  /// Used to ensure that when any other synchronization operation or
-  /// List-fetching operation is going on, any subsequent request for new
-  /// synchronization/attendance/download operations are ignored.
-  /*void loadingStateWrapper(void Function() intendedFn) {
-    if (getLoadingState()) {
-      return;
-    }
-    intendedFn();
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -236,4 +212,4 @@ class ExpenseDetailsDialog extends StatelessWidget {
   }
 }
 
-//TODO: Drawer: AtAGlance,TrackRelativeChange,Sync
+//TODO: Drawer: AtAGlance,TrackRelativeChange

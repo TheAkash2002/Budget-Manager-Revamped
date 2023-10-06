@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:budget_manager_revamped/ui/insert_edit_expense.dart';
-import 'package:budget_manager_revamped/db/database_helper.dart';
-import 'package:budget_manager_revamped/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../db/firestore_helper.dart';
 import '../models/models.dart';
+import '../ui/insert_edit_expense.dart';
+import '../utils/utils.dart';
 
 class ExpenseController extends GetxController {
   late TextEditingController amountController,
@@ -14,6 +14,7 @@ class ExpenseController extends GetxController {
       descriptionController;
   DateTime pickerDate = DateTime.now();
   ExpenseDirection expenseDirection = ExpenseDirection.payment;
+  late Stream<List<Expense>> paymentStream;
 
   //late List<Expense> allExpenses;
   late List<Expense> allPayments;
@@ -35,20 +36,18 @@ class ExpenseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    refreshExpensesList();
+    refreshExpenseStreamReference();
   }
 
-  Future<void> refreshExpensesList() async {
-    List<Expense> allExpenses = await getAllExpenses();
-    allPayments = allExpenses.where((expense) => expense.direction == ExpenseDirection.payment).toList();
-    allLoans = allExpenses.where((expense) => expense.direction != ExpenseDirection.payment).toList();
+  Future<void> refreshExpenseStreamReference() async {
+    paymentStream = allExpensesStream();
     update();
   }
 
   void createExpense(context, ExpenseDialogMode mode) async {
     if (await validateExpenseDialog(context, mode)) {
       Expense newExpense = Expense(
-        id: 0,
+        id: "",
         amount: double.tryParse(amountController.text)!,
         category: categoryController.text,
         description: descriptionController.text,
@@ -58,8 +57,8 @@ class ExpenseController extends GetxController {
       );
       await insertExpense(newExpense);
       Navigator.of(context).pop(true);
-      showToast("Inserted expense successfully!", context);
-      refreshExpensesList();
+      showToast("Inserted expense successfully!");
+      //refreshExpensesList();
     }
   }
 
@@ -73,17 +72,17 @@ class ExpenseController extends GetxController {
       currentExpense!.lastEdit = DateTime.now();
       await updateExpense(currentExpense!);
       Navigator.of(context).pop(true);
-      showToast("Updated expense successfully!", context);
-      refreshExpensesList();
+      showToast("Updated expense successfully!");
+      //refreshExpensesList();
     }
   }
 
-  void removeExpense(int expenseId) async {
+  void removeExpense(String expenseId) async {
     await deleteExpense(expenseId);
-    refreshExpensesList();
+    //refreshExpensesList();
   }
 
-  Future<void> refreshInsertEditExpenseControllers() async{
+  Future<void> refreshInsertEditExpenseControllers() async {
     amountController.clear();
     categoryController.clear();
     descriptionController.clear();
@@ -92,18 +91,19 @@ class ExpenseController extends GetxController {
     allCategories = await getExistingCategoriesList();
   }
 
-  Future<bool> validateExpenseDialog(BuildContext context, ExpenseDialogMode mode) async {
+  Future<bool> validateExpenseDialog(
+      BuildContext context, ExpenseDialogMode mode) async {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
-      showToast("Enter valid amount!", context);
+      showToast("Enter valid amount!");
       return false;
     }
     if (categoryController.text.isEmpty) {
-      showToast("Enter a value for category!", context);
+      showToast("Enter a value for category!");
       return false;
     }
     if (descriptionController.text.isEmpty) {
-      showToast("Enter a value for description!", context);
+      showToast("Enter a value for description!");
       return false;
     }
 
@@ -115,7 +115,8 @@ class ExpenseController extends GetxController {
         barrierDismissible: false, // user must tap button!
         builder: (ctx) => AlertDialog(
           title: const Text("Insert Without Target"),
-          content: const Text("The target for the given month is not inserted. Are you sure you want to insert an expense for the given date?"),
+          content: const Text(
+              "The target for the given month is not inserted. Are you sure you want to insert an expense for the given date?"),
           actions: <Widget>[
             TextButton(
               child: const Text('No'),
@@ -134,15 +135,18 @@ class ExpenseController extends GetxController {
 
     double target = await getTarget(pickerDate);
     List<double> expenseValues = (await getAllExpensesInGivenMonth(pickerDate))
-        .map((e) => e.amount).toList();
-    double expensesInGivenMonth = (expenseValues.isEmpty ? 0 : expenseValues.reduce((value, element) => value+element));
+        .map((e) => e.amount)
+        .toList();
+    double expensesInGivenMonth = (expenseValues.isEmpty
+        ? 0
+        : expenseValues.reduce((value, element) => value + element));
     double currentAmount = double.tryParse(amountController.text)!;
-    if(isEditMode){
+    if (isEditMode) {
       expensesInGivenMonth -= currentExpense!.amount;
     }
     double overrideAmount = expensesInGivenMonth + currentAmount - target;
 
-    if(overrideAmount > 0){
+    if (overrideAmount > 0) {
       bool? confirmTargetOverride = await showDialog<bool?>(
         context: context,
         barrierDismissible: false, // user must tap button!
@@ -165,7 +169,7 @@ class ExpenseController extends GetxController {
         ),
       );
 
-      if(confirmTargetOverride == null || confirmTargetOverride == false){
+      if (confirmTargetOverride == null || confirmTargetOverride == false) {
         return false;
       }
     }
@@ -184,7 +188,7 @@ class ExpenseController extends GetxController {
     }
   }
 
-  Future<void> instantiateEditExpenseControllers(Expense expense) async{
+  Future<void> instantiateEditExpenseControllers(Expense expense) async {
     currentExpense = expense;
     amountController.text = currentExpense!.amount.toString();
     categoryController.text = currentExpense!.category;

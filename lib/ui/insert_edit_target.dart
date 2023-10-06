@@ -1,10 +1,8 @@
-import 'package:budget_manager_revamped/controller/expense_controller.dart';
-import 'package:budget_manager_revamped/controller/targets_controller.dart';
-import 'package:budget_manager_revamped/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../controller/targets_controller.dart';
 import '../utils/utils.dart';
 
 enum TargetDialogMode { insert, edit }
@@ -34,10 +32,11 @@ class InsertEditTargetDialog extends StatelessWidget {
                 decoration: const InputDecoration(hintText: "Amount"),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: GestureDetector(
                     onTap: () {
-                      if(mode == TargetDialogMode.insert){
+                      if (mode == TargetDialogMode.insert) {
                         openDatePicker(context, _.pickerDate, _.setPickerDate);
                       }
                     },
@@ -53,7 +52,9 @@ class InsertEditTargetDialog extends StatelessWidget {
           ),
           TextButton(
             child: const Text('Submit'),
-            onPressed: () => (mode == TargetDialogMode.insert ? _.createTarget(context) : _.editTarget(context)),
+            onPressed: () => (mode == TargetDialogMode.insert
+                ? _.createTarget(context)
+                : _.editTarget(context)),
           ),
         ],
       ),

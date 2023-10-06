@@ -1,85 +1,86 @@
-import 'package:budget_manager_revamped/db/database_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
 
-class TargetsController extends GetxController{
+class TargetsController extends GetxController {
   late TextEditingController amountController;
   late DateTime pickerDate;
 
   @override
-  void onInit(){
+  void onInit() {
     super.onInit();
-    refreshTargetsList();
+    refreshTargetStreamReference();
   }
 
-  TargetsController(){
+  TargetsController() {
     amountController = TextEditingController();
     pickerDate = DateTime.now();
   }
 
-  void refreshInsertEditTargetControllers(){
+  void refreshInsertEditTargetControllers() {
     amountController.clear();
     pickerDate = DateTime.now();
   }
 
-  void instantiateEditTargetControllers(Target target){
+  void instantiateEditTargetControllers(Target target) {
     currentTarget = target;
     amountController.text = target.amount.toString();
     setPickerDate(target.date);
   }
 
-  List<Target> allTargets = List.empty();
+  late Stream<List<Target>> targetStream;
 
   Target? currentTarget;
 
-  Future<void> refreshTargetsList() async{
-    allTargets = await getAllTargets();
+  Future<void> refreshTargetStreamReference() async {
+    targetStream = allTargetsStream();
     update();
   }
 
-  void createTarget(BuildContext context) async{
-    if(await isTargetSet(pickerDate)){
-      showToast("Target already exists for given month and year!", context);
+  void createTarget(BuildContext context) async {
+    if (await isTargetSet(pickerDate)) {
+      showToast("Target already exists for given month and year!");
       return;
     }
 
-    if(validateTargetDialog(context)){
+    if (validateTargetDialog()) {
       Target newTarget = Target(
-        id: 0,
+        id: "",
         amount: double.tryParse(amountController.text)!,
         date: getFirstDayOfMonth(pickerDate),
         lastEdit: DateTime.now(),
       );
       await insertTarget(newTarget);
       Navigator.of(context).pop(true);
-      showToast("Inserted target successfully!", context);
-      refreshTargetsList();
+      showToast("Inserted target successfully!");
+      //refreshTargetsList();
     }
   }
 
-  void editTarget(BuildContext context) async{
-    if(validateTargetDialog(context)){
+  void editTarget(BuildContext context) async {
+    if (validateTargetDialog()) {
       currentTarget!.amount = double.tryParse(amountController.text)!;
       currentTarget!.date = getFirstDayOfMonth(pickerDate);
       currentTarget!.lastEdit = DateTime.now();
       await updateTarget(currentTarget!);
       Navigator.of(context).pop(true);
-      showToast("Updated target successfully!", context);
-      refreshTargetsList();
+      showToast("Updated target successfully!");
+      //refreshTargetsList();
     }
   }
 
-  void removeTarget(int expenseId) async{
+  void removeTarget(String expenseId) async {
     await deleteTarget(expenseId);
-    refreshTargetsList();
+    //refreshTargetsList();
   }
 
-  bool validateTargetDialog(BuildContext context){
-    if(amountController.text.isEmpty || double.tryParse(amountController.text) == null){
-      showToast("Enter valid amount!", context);
+  bool validateTargetDialog() {
+    if (amountController.text.isEmpty ||
+        double.tryParse(amountController.text) == null) {
+      showToast("Enter valid amount!");
       return false;
     }
     return true;
