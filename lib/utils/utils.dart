@@ -59,13 +59,11 @@ class RowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: Text(text)),
-        ],
+        children: [Text(text)],
       ),
     );
   }

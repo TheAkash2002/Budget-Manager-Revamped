@@ -4,31 +4,24 @@ import 'package:intl/intl.dart';
 
 import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
-import '../controller/tab_controller.dart';
 import '../models/models.dart';
 import '../ui/insert_edit_expense.dart';
 import '../utils/utils.dart';
 
 class Home extends StatelessWidget {
-  final MyTabController _tabx = Get.put(MyTabController());
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExpenseController>(
       builder: (_) => Scaffold(
         appBar: AppBar(
           title: const Text("Budget Manager - Revamped"),
-          actions: [
+          actions: const [
             IconButton(
               onPressed: navigateToLoginPage,
-              icon: const Icon(Icons.logout),
+              icon: Icon(Icons.logout),
               tooltip: "Log Out",
             ),
           ],
-          bottom: TabBar(
-            controller: _tabx.controller,
-            tabs: _tabx.myTabs,
-          ),
         ),
         drawer: NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),
@@ -38,36 +31,31 @@ class Home extends StatelessWidget {
               if (snapshot.hasError || !snapshot.hasData) {
                 return const Text("Couldn't load");
               }
-              return TabBarView(
-                controller: _tabx.controller,
-                children: _tabx.myTabs
-                    .map((tab) => Padding(
-                          padding:
-                              const EdgeInsets.only(left: 10.0, right: 10.0),
-                          child: RefreshIndicator(
-                            onRefresh: () async {},
-                            child: Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  child: ListView.builder(
-                                    itemCount: snapshot.data!.length,
-                                    itemBuilder: (context, index) =>
-                                        ExpenseItem(snapshot.data![index],
-                                            _.editExpense, _.removeExpense),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ))
-                    .toList(),
+              return Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                child: RefreshIndicator(
+                  onRefresh: () async {},
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) => ExpenseItem(
+                              snapshot.data![index],
+                              _.editExpense,
+                              _.removeExpense),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () => showCreateExpenseDialog(context),
-          child: const Icon(Icons.add),
           tooltip: "Create New Expense",
+          child: const Icon(Icons.add),
         ),
       ),
     );
@@ -106,9 +94,8 @@ class ExpenseItem extends StatelessWidget {
                 children: [
                   RowWidget("Amount: ${expense.amount}"),
                   RowWidget("Category: ${expense.category}"),
-                  if (expense.direction != ExpenseDirection.payment)
-                    RowWidget(
-                        "Type: ${toExpenseDirectionUIString(expense.direction)}"),
+                  RowWidget(
+                      "Type: ${toExpenseDirectionUIString(expense.direction)}"),
                   RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
                 ],
               ),
@@ -181,26 +168,21 @@ class ExpenseItem extends StatelessWidget {
 class ExpenseDetailsDialog extends StatelessWidget {
   final Expense expense;
 
-  const ExpenseDetailsDialog(this.expense);
+  const ExpenseDetailsDialog(this.expense, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Details"),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Center(
-          child: ListView(
-            children: [
-              RowWidget("Amount: ${expense.amount}"),
-              RowWidget(
-                  "Type: ${toExpenseDirectionUIString(expense.direction)}"),
-              RowWidget("Category: ${expense.category}"),
-              RowWidget("Description: ${expense.description}"),
-              RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
-            ],
-          ),
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RowWidget("Amount: ${expense.amount}"),
+          RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
+          RowWidget("Category: ${expense.category}"),
+          RowWidget("Description: ${expense.description}"),
+          RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
+        ],
       ),
       actions: <Widget>[
         TextButton(

@@ -67,3 +67,5 @@ void navigateToLoginPage() async {
     showToast("There was an error in logging the user out.");
   }
 }
+
+bool isLoggedIn() => FirebaseAuth.instance.currentUser != null;

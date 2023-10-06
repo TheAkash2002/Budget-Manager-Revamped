@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../auth/auth.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../ui/insert_edit_expense.dart';
@@ -36,7 +37,11 @@ class ExpenseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    refreshExpenseStreamReference();
+    if (isLoggedIn()) {
+      refreshExpenseStreamReference();
+    } else {
+      signOut();
+    }
   }
 
   Future<void> refreshExpenseStreamReference() async {
