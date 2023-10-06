@@ -60,7 +60,7 @@ class ExpenseController extends GetxController {
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
-      showToast("Inserted expense successfully!");
+      showToast("Success", "Inserted expense successfully!");
       //refreshExpensesList();
     }
   }
@@ -77,7 +77,7 @@ class ExpenseController extends GetxController {
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
-      showToast("Updated expense successfully!");
+      showToast("Success", "Updated expense successfully!");
       //refreshExpensesList();
     }
   }
@@ -99,15 +99,15 @@ class ExpenseController extends GetxController {
   Future<bool> validateExpenseDialog(ExpenseDialogMode mode) async {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
-      showToast("Enter valid amount!");
+      showToast("Error", "Enter valid amount!");
       return false;
     }
     if (categoryController.text.isEmpty) {
-      showToast("Enter a value for category!");
+      showToast("Error", "Enter a value for category!");
       return false;
     }
     if (descriptionController.text.isEmpty) {
-      showToast("Enter a value for description!");
+      showToast("Error", "Enter a value for description!");
       return false;
     }
 
@@ -151,7 +151,7 @@ class ExpenseController extends GetxController {
               child: const Text('No'),
               onPressed: () => Navigator.of(ctx).pop(false),
             ),
-            TextButton(
+            ElevatedButton(
               child: const Text('Yes'),
               onPressed: () => Navigator.of(ctx).pop(true),
             ),

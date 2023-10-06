@@ -42,8 +42,9 @@ class InsertEditTargetDialog extends StatelessWidget {
                       }
                     },
                     child: InputDecorator(
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(), labelText: "Month"),
+                        decoration:  InputDecoration(
+                          enabled: mode == TargetDialogMode.insert,
+                            border: const OutlineInputBorder(), labelText: "Month"),
                         child: Text(DateFormat.yMMMM().format(_.pickerDate))),
                   )),
             ],
@@ -54,7 +55,7 @@ class InsertEditTargetDialog extends StatelessWidget {
             child: const Text('Cancel'),
             onPressed: () => Navigator.of(context).pop(false),
           ),
-          TextButton(
+          ElevatedButton(
             child: const Text('Submit'),
             onPressed: () => (mode == TargetDialogMode.insert
                 ? _.createTarget(context)

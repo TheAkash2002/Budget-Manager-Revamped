@@ -42,7 +42,7 @@ class TargetsController extends GetxController {
 
   void createTarget(BuildContext context) async {
     if (await isTargetSet(pickerDate)) {
-      showToast("Target already exists for given month and year!");
+      showToast("Warning", "Target already exists for given month and year!");
       return;
     }
 
@@ -57,7 +57,7 @@ class TargetsController extends GetxController {
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
-      showToast("Inserted target successfully!");
+      showToast("Success", "Inserted target successfully!");
       //refreshTargetsList();
     }
   }
@@ -71,7 +71,7 @@ class TargetsController extends GetxController {
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
-      showToast("Updated target successfully!");
+      showToast("Success", "Updated target successfully!");
       //refreshTargetsList();
     }
   }
@@ -84,7 +84,7 @@ class TargetsController extends GetxController {
   bool validateTargetDialog() {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
-      showToast("Enter valid amount!");
+      showToast("Error", "Enter valid amount!");
       return false;
     }
     return true;

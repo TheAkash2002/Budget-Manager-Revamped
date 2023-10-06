@@ -39,13 +39,13 @@ void signIn() async {
   try {
     UserCredential credential = await signInWithGoogle();
     if (credential.user != null) {
-      showToast("Logged in successfully.");
+      showToast("Success", "Logged in successfully.");
       Get.offAllNamed('/');
     } else {
-      showToast("Invalid user - try logging in again.");
+      showToast("Error", "Invalid user - try logging in again.");
     }
   } catch (e) {
-    showToast("Some error occured.");
+    showToast("Error", "Some error occured.");
     print(e);
   }
 }
@@ -55,7 +55,7 @@ Future<void> signOut() async {
   if (!kIsWeb) {
     await GoogleSignIn().signOut();
   }
-  showToast("User logged out successfully.");
+  showToast("Success", "User logged out successfully.");
 }
 
 /// Opens [Login] after a logout operation.
@@ -64,8 +64,10 @@ void navigateToLoginPage() async {
     await signOut();
     Get.offAllNamed('/login');
   } catch (_) {
-    showToast("There was an error in logging the user out.");
+    showToast("Error", "There was an error in logging the user out.");
   }
 }
 
 bool isLoggedIn() => FirebaseAuth.instance.currentUser != null;
+
+User? currentUser = FirebaseAuth.instance.currentUser;

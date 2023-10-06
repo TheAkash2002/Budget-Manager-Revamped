@@ -1,14 +1,18 @@
+import 'package:budget_manager_revamped/auth/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// Utility to display [message] as a toast.
-void showToast(String message) {
+void showToast(String title, String message) {
   Get.snackbar(
+    title,
     message,
-    "",
-    colorText: Colors.white,
-    backgroundColor: Theme.of(Get.context!).colorScheme.primary,
-    icon: const Icon(Icons.add_alert),
+    colorText: Theme.of(Get.context!).colorScheme.onSurface,
+    backgroundColor: Theme.of(Get.context!).colorScheme.surface,
+    icon: Icon(
+      Icons.add_alert,
+      color: Theme.of(Get.context!).colorScheme.onSurface,
+    ),
   );
   // FToast fToast = FToast();
   // fToast.init(context);
@@ -48,7 +52,7 @@ void openDatePicker(BuildContext context, DateTime initialDate,
       callback(newDate);
     }
   } catch (_) {
-    showToast("There was an error in capturing the date.");
+    showToast("Error", "There was an error in capturing the date.");
   }
 }
 
@@ -87,11 +91,33 @@ class NavDrawer extends StatelessWidget {
       padding: EdgeInsets.zero,
       children: [
         DrawerHeader(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          child: const Text('Drawer Header'),
-        ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  foregroundImage: NetworkImage(
+                      currentUser?.photoURL ?? "http://google.com"),
+                  radius: 40,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: Text(
+                    getInitials(currentUser?.displayName ?? "User"),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary),
+                  ),
+                ),
+                Text(
+                  currentUser?.displayName ?? "User",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+                Text(currentUser?.email ?? "Email",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary))
+              ],
+            )),
         ListTile(
           title: const Text('Expenses'),
           tileColor: Get.currentRoute == '/' ? Colors.grey[300] : null,
@@ -106,3 +132,7 @@ class NavDrawer extends StatelessWidget {
     ));
   }
 }
+
+String getInitials(String name) => name.isNotEmpty
+    ? name.trim().split(RegExp(' +')).map((s) => s[0]).take(2).join()
+    : '';

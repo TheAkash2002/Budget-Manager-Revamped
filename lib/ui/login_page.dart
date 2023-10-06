@@ -17,33 +17,37 @@ class Login extends StatelessWidget {
               elevation: 500,
               child: Padding(
                 padding: const EdgeInsets.all(30),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Text(
-                    "Budget Manager - Revamped",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-                    child: ElevatedButton(
-                      onPressed: signIn,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(100, 50),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Budget Manager\nRevamped",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 24),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Icon(Icons.android),
-                            // <-- Use 'Image.asset(...)' here
-                            SizedBox(width: 12),
-                            Text('Sign in with Google'),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                        child: ElevatedButton(
+                          onPressed: signIn,
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(100, 50),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(6),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Icon(Icons.android),
+                                SizedBox(width: 12),
+                                Text('Sign in with Google'),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ]),
+                    ]),
               )),
         ));
   }
