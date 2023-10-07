@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../auth/auth.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
@@ -8,11 +9,17 @@ import '../utils/utils.dart';
 class TargetsController extends GetxController {
   late TextEditingController amountController;
   late DateTime pickerDate;
+  late Stream<List<Target>> targetStream = const Stream<List<Target>>.empty();
+  Target? currentTarget;
 
   @override
   void onInit() {
     super.onInit();
-    refreshTargetStreamReference();
+    if (isLoggedIn()) {
+      refreshTargetStreamReference();
+    } else {
+      navigateToLoginPage();
+    }
   }
 
   TargetsController() {
@@ -30,10 +37,6 @@ class TargetsController extends GetxController {
     amountController.text = target.amount.toString();
     setPickerDate(target.date);
   }
-
-  late Stream<List<Target>> targetStream;
-
-  Target? currentTarget;
 
   Future<void> refreshTargetStreamReference() async {
     targetStream = allTargetsStream();

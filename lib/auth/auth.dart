@@ -35,7 +35,7 @@ Future<UserCredential> signInWithGoogle() async {
   return await FirebaseAuth.instance.signInWithCredential(credential);
 }
 
-void signIn() async {
+Future<void> signIn() async {
   try {
     UserCredential credential = await signInWithGoogle();
     if (credential.user != null) {

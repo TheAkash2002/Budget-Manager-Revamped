@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../auth/auth.dart';
 import '../controller/targets_controller.dart';
 import '../models/models.dart';
 import '../ui/insert_edit_target_dialog.dart';
@@ -18,13 +17,7 @@ class Targets extends StatelessWidget {
       builder: (_) => Scaffold(
         appBar: AppBar(
           title: const Text("Monthly Targets"),
-          actions: const [
-            IconButton(
-              onPressed: navigateToLoginPage,
-              icon: Icon(Icons.logout),
-              tooltip: "Log Out",
-            ),
-          ],
+          actions: const [],
         ),
         drawer: const NavDrawer(),
         //body: Center(child: Text('Home: ${_.allExpenses.length}')),

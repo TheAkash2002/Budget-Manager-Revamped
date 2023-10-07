@@ -39,12 +39,12 @@ void showToast(String title, String message) {
 }
 
 /// Opens a [DatePicker] widget.
-void openDatePicker(BuildContext context, DateTime initialDate,
+void openDatePicker(BuildContext context, DateTime? initialDate,
     void Function(DateTime) callback) async {
   try {
     final DateTime? newDate = await showDatePicker(
       context: context,
-      initialDate: initialDate,
+      initialDate: initialDate ?? DateTime.now(),
       firstDate: DateTime(2022),
       lastDate: DateTime(2050),
     );
@@ -95,17 +95,25 @@ class NavDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  foregroundImage: NetworkImage(
-                      currentUser?.photoURL ?? "http://google.com"),
-                  radius: 40,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    getInitials(currentUser?.displayName ?? "User"),
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary),
+                Text(
+                  "Budget Manager - Revamped",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    foregroundImage: NetworkImage(
+                        currentUser?.photoURL ?? "http://google.com"),
+                    radius: 30,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      getInitials(currentUser?.displayName ?? "User"),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
                   ),
                 ),
                 Text(
@@ -120,13 +128,20 @@ class NavDrawer extends StatelessWidget {
             )),
         ListTile(
           title: const Text('Expenses'),
+          leading: const Icon(Icons.attach_money),
           tileColor: Get.currentRoute == '/' ? Colors.grey[300] : null,
           onTap: () => Get.offAllNamed('/'),
         ),
         ListTile(
           title: const Text('Targets'),
+          leading: const Icon(Icons.check_box_outlined),
           tileColor: Get.currentRoute == '/targets' ? Colors.grey[300] : null,
           onTap: () => Get.offAllNamed('/targets'),
+        ),
+        const ListTile(
+          leading: Icon(Icons.logout),
+          title: Text('Log Out'),
+          onTap: navigateToLoginPage,
         ),
       ],
     ));

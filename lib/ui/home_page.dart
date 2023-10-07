@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
 import '../models/models.dart';
 import '../ui/insert_edit_expense_dialog.dart';
+import '../ui/list_filter.dart';
 import '../utils/utils.dart';
 import 'delete_expense_dialog.dart';
 
@@ -17,12 +17,13 @@ class Home extends StatelessWidget {
     return GetBuilder<ExpenseController>(
       builder: (_) => Scaffold(
         appBar: AppBar(
-          title: const Text("Budget Manager - Revamped"),
-          actions: const [
+          title: const Text("Expenses"),
+          actions: [
             IconButton(
-              onPressed: navigateToLoginPage,
-              icon: Icon(Icons.logout),
-              tooltip: "Log Out",
+              onPressed: () => showModalBottomSheet(
+                  context: context, builder: (context) => ListFilter()),
+              icon: const Icon(Icons.filter_list),
+              tooltip: "Filter",
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 import '../auth/auth.dart';
 import '../db/firestore_helper.dart';
@@ -41,7 +42,10 @@ class ExpenseController extends GetxController {
   }
 
   Future<void> refreshExpenseStreamReference() async {
-    paymentStream = allExpensesStream();
+    paymentStream = allExpensesStream()
+        .combineLatest<FilterState, List<Expense>>(
+            filterStreamController.stream, filterListUsingState);
+    applyFilter();
     update();
   }
 
@@ -187,4 +191,63 @@ class ExpenseController extends GetxController {
     setPickerDate(currentExpense!.date);
     allCategories = await getExistingCategoriesList();
   }
+
+  //Filter functions
+  Set<ExpenseDirection> allowedDirections = ExpenseDirection.values.toSet();
+  DateTime? filterStartDate, filterEndDate;
+
+  void onSelectExpenseDirectionChip(ExpenseDirection ed, bool selected) {
+    if (selected) {
+      allowedDirections.add(ed);
+    } else {
+      allowedDirections.remove(ed);
+    }
+    update();
+  }
+
+  void setFilterStartDate(DateTime? dateTime) {
+    filterStartDate = dateTime;
+    update();
+  }
+
+  void setFilterEndDate(DateTime? dateTime) {
+    filterEndDate = dateTime;
+    update();
+  }
+
+  void resetFilterStartDate() => setFilterStartDate(null);
+
+  void resetFilterEndDate() => setFilterEndDate(null);
+
+  void applyFilter() => filterStreamController.add(FilterState(
+        allowed: allowedDirections,
+        startDate: filterStartDate,
+        endDate: filterEndDate,
+      ));
+
+  StreamController<FilterState> filterStreamController =
+      StreamController<FilterState>();
+
+  List<Expense> filterListUsingState(List<Expense> list, FilterState state) {
+    return list
+        .where((item) => state.allowed.contains(item.direction))
+        .where((item) =>
+            state.startDate == null || item.date.isAfter(state.startDate!))
+        .where((item) =>
+            state.endDate == null ||
+            item.date.isBefore(state.endDate!.add(const Duration(days: 1))))
+        .toList();
+  }
+
+  void onApplyClick() {
+    applyFilter();
+    Navigator.of(Get.context!).pop(true);
+  }
+}
+
+class FilterState {
+  Set<ExpenseDirection> allowed = {};
+  DateTime? startDate, endDate;
+
+  FilterState({this.allowed = const {}, this.startDate, this.endDate});
 }
