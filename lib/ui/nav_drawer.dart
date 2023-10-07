@@ -6,8 +6,8 @@ import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
 import '../controller/home_controller.dart';
 import '../controller/targets_controller.dart';
-import '../ui/insert_edit_expense_dialog.dart';
-import '../ui/insert_edit_target_dialog.dart';
+import 'insert_edit_expense_dialog.dart';
+import 'insert_edit_target_dialog.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});

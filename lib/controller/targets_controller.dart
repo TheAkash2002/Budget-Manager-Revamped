@@ -7,6 +7,8 @@ import '../models/models.dart';
 import '../utils/utils.dart';
 
 class TargetsController extends GetxController {
+  bool isLoading = false;
+
   late TextEditingController amountController;
   late DateTime pickerDate;
   late Stream<List<Target>> targetStream = const Stream<List<Target>>.empty();
@@ -93,6 +95,11 @@ class TargetsController extends GetxController {
 
   void setPickerDate(DateTime dateTime) {
     pickerDate = getFirstDayOfMonth(dateTime);
+    update();
+  }
+
+  void setLoadingState(bool newState) {
+    isLoading = newState;
     update();
   }
 }

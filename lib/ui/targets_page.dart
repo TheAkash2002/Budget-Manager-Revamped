@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../controller/targets_controller.dart';
 import '../models/models.dart';
 import '../ui/insert_edit_target_dialog.dart';
-import '../utils/utils.dart';
+import 'custom_components.dart';
 import 'delete_target_dialog.dart';
 
 class Targets extends StatelessWidget {
@@ -17,33 +17,28 @@ class Targets extends StatelessWidget {
       builder: (_) => StreamBuilder<List<Target>>(
           stream: _.targetStream,
           builder: (context, snapshot) {
-            if (snapshot.hasError || !snapshot.hasData) {
-              print("Error!");
-              print(snapshot.error);
-              return const Text("Error");
+            if (snapshot.hasError) {
+              return const Text("Error in Loading values");
             }
             if (!snapshot.hasData) {
-              print("No data!");
               return const Text("No data!");
             }
             return Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: RefreshIndicator(
-                onRefresh: _.refreshTargetStreamReference,
-                child: Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) => TargetItem(
-                            snapshot.data![index],
-                            _.editTarget,
-                            _.removeTarget),
-                      ),
+              child: Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) => TargetItem(
+                          snapshot.data![index], _.editTarget, _.removeTarget),
                     ),
-                  ],
-                ),
+                  ),
+                  if (_.isLoading ||
+                      snapshot.connectionState == ConnectionState.waiting)
+                    const Loading()
+                ],
               ),
             );
           }),
@@ -59,16 +54,6 @@ class TargetItem extends StatelessWidget {
   const TargetItem(
       this.target, this.editTargetController, this.deleteTargetController,
       {super.key});
-
-  /// Used to ensure that when any other synchronization operation or
-  /// List-fetching operation is going on, any subsequent request for new
-  /// synchronization/attendance/download operations are ignored.
-  /*void loadingStateWrapper(void Function() intendedFn) {
-    if (getLoadingState()) {
-      return;
-    }
-    intendedFn();
-  }*/
 
   @override
   Widget build(BuildContext context) {

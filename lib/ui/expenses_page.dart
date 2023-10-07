@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../models/models.dart';
-import '../utils/utils.dart';
+import 'custom_components.dart';
 import 'delete_expense_dialog.dart';
 import 'insert_edit_expense_dialog.dart';
 
@@ -17,27 +17,30 @@ class Expenses extends StatelessWidget {
       builder: (_) => StreamBuilder<List<Expense>>(
           stream: _.paymentStream,
           builder: (context, snapshot) {
-            if (snapshot.hasError || !snapshot.hasData) {
-              return const Text("Couldn't load");
+            if (snapshot.hasError) {
+              return const Text("Error occured in fetching data.");
+            }
+            if (!snapshot.hasData) {
+              return const Text("No data!");
             }
             return Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: RefreshIndicator(
-                onRefresh: () async {},
-                child: Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      child: ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) => ExpenseItem(
-                            snapshot.data![index],
-                            _.editExpense,
-                            _.removeExpense),
-                      ),
+              child: Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) => ExpenseItem(
+                          snapshot.data![index],
+                          _.editExpense,
+                          _.removeExpense),
                     ),
-                  ],
-                ),
+                  ),
+                  if (_.isLoading ||
+                      snapshot.connectionState == ConnectionState.waiting)
+                    const Loading()
+                ],
               ),
             );
           }),

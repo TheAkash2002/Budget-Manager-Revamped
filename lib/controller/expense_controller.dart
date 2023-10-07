@@ -12,6 +12,8 @@ import '../ui/insert_edit_expense_dialog.dart';
 import '../utils/utils.dart';
 
 class ExpenseController extends GetxController {
+  bool isLoading = false;
+
   late TextEditingController amountController,
       categoryController,
       descriptionController;
@@ -240,6 +242,11 @@ class ExpenseController extends GetxController {
   void onApplyClick() {
     applyFilter();
     Navigator.of(Get.context!).pop(true);
+  }
+
+  void setLoadingState(bool newState) {
+    isLoading = newState;
+    update();
   }
 }
 

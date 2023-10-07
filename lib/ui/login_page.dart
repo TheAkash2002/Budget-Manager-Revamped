@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../controller/auth_controller.dart';
+import '../ui/custom_components.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -54,11 +54,7 @@ class Login extends StatelessWidget {
                         ]),
                   )),
             ),
-            if (_.isLoading)
-              Center(
-                child: LoadingAnimationWidget.fourRotatingDots(
-                    color: Theme.of(context).colorScheme.background, size: 60),
-              )
+            if (_.isLoading) const Loading()
           ])),
     );
   }

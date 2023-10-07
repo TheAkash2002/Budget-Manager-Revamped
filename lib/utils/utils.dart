@@ -33,23 +33,6 @@ void openDatePicker(BuildContext context, DateTime? initialDate,
   }
 }
 
-class RowWidget extends StatelessWidget {
-  final String text;
-
-  const RowWidget(this.text, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [Text(text)],
-      ),
-    );
-  }
-}
-
 DateTime getFirstDayOfMonth(DateTime dateTime) {
   return DateTime(dateTime.year, dateTime.month);
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controller/home_controller.dart';
-import '../utils/navigation.dart';
+import 'nav_drawer.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
