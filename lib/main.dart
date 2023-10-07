@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'controller/auth_controller.dart';
 import 'controller/expense_controller.dart';
+import 'controller/home_controller.dart';
 import 'controller/targets_controller.dart';
 import 'firebase_options.dart';
 import 'notification/notification_service.dart';
 import 'ui/home_page.dart';
 import 'ui/login_page.dart';
-import 'ui/targets_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,18 +34,16 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/login',
           page: () => const Login(),
+          binding: BindingsBuilder(() {
+            Get.put<AuthController>(AuthController());
+          }),
         ),
         GetPage(
           name: '/',
           page: () => const Home(),
           binding: BindingsBuilder(() {
+            Get.put<HomeController>(HomeController());
             Get.put<ExpenseController>(ExpenseController());
-          }),
-        ),
-        GetPage(
-          name: '/targets',
-          page: () => const Targets(),
-          binding: BindingsBuilder(() {
             Get.put<TargetsController>(TargetsController());
           }),
         ),

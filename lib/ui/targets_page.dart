@@ -14,62 +14,39 @@ class Targets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<TargetsController>(
-      builder: (_) => Scaffold(
-        appBar: AppBar(
-          title: const Text("Monthly Targets"),
-          actions: const [],
-        ),
-        drawer: const NavDrawer(),
-        //body: Center(child: Text('Home: ${_.allExpenses.length}')),
-        body: StreamBuilder<List<Target>>(
-            stream: _.targetStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasError || !snapshot.hasData) {
-                print("Error!");
-                print(snapshot.error);
-                return const Text("Error");
-              }
-              if (!snapshot.hasData) {
-                print("No data!");
-                return const Text("No data!");
-              }
-              return Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                child: RefreshIndicator(
-                  onRefresh: _.refreshTargetStreamReference,
-                  child: Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(15),
-                        child: ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) => TargetItem(
-                              snapshot.data![index],
-                              _.editTarget,
-                              _.removeTarget),
-                        ),
+      builder: (_) => StreamBuilder<List<Target>>(
+          stream: _.targetStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError || !snapshot.hasData) {
+              print("Error!");
+              print(snapshot.error);
+              return const Text("Error");
+            }
+            if (!snapshot.hasData) {
+              print("No data!");
+              return const Text("No data!");
+            }
+            return Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              child: RefreshIndicator(
+                onRefresh: _.refreshTargetStreamReference,
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) => TargetItem(
+                            snapshot.data![index],
+                            _.editTarget,
+                            _.removeTarget),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            }),
-        floatingActionButton: FloatingActionButton(
-          onPressed: showCreateTargetDialog,
-          tooltip: "Create New Target",
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
-
-  void showCreateTargetDialog() {
-    Get.find<TargetsController>().refreshInsertEditTargetControllers();
-    showDialog<bool?>(
-      context: Get.context!,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) =>
-          const InsertEditTargetDialog(TargetDialogMode.insert),
+              ),
+            );
+          }),
     );
   }
 }

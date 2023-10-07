@@ -17,8 +17,6 @@ class TargetsController extends GetxController {
     super.onInit();
     if (isLoggedIn()) {
       refreshTargetStreamReference();
-    } else {
-      navigateToLoginPage();
     }
   }
 

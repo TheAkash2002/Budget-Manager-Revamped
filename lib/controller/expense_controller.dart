@@ -36,8 +36,6 @@ class ExpenseController extends GetxController {
     super.onInit();
     if (isLoggedIn()) {
       refreshExpenseStreamReference();
-    } else {
-      navigateToLoginPage();
     }
   }
 
