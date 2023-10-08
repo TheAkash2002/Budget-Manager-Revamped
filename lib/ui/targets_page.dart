@@ -17,28 +17,24 @@ class Targets extends StatelessWidget {
       builder: (_) => StreamBuilder<List<Target>>(
           stream: _.targetStream,
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: Loading());
+            }
             if (snapshot.hasError) {
-              return const Text("Error in Loading values");
+              return const Center(child: Text("Some error occurred."));
             }
             if (!snapshot.hasData) {
-              return const Text("No data!");
+              return const Center(child: Text("No data!"));
             }
             return Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: Stack(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    child: ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) => TargetItem(
-                          snapshot.data![index], _.editTarget, _.removeTarget),
-                    ),
-                  ),
-                  if (_.isLoading ||
-                      snapshot.connectionState == ConnectionState.waiting)
-                    const Loading()
-                ],
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                child: ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) =>
+                      TargetItem(snapshot.data![index], _.removeTarget),
+                ),
               ),
             );
           }),
@@ -48,12 +44,9 @@ class Targets extends StatelessWidget {
 
 class TargetItem extends StatelessWidget {
   final Target target;
-  final void Function(BuildContext) editTargetController;
   final void Function(String) deleteTargetController;
 
-  const TargetItem(
-      this.target, this.editTargetController, this.deleteTargetController,
-      {super.key});
+  const TargetItem(this.target, this.deleteTargetController, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
-import 'package:budget_manager_revamped/auth/auth.dart';
 import 'package:get/get.dart';
+
+import '../auth/auth.dart';
 
 class AuthController extends GetxController {
   bool isLoading = false;
@@ -10,10 +11,8 @@ class AuthController extends GetxController {
   }
 
   Future<void> signInUser() async {
-    isLoading = true;
-    update();
+    setLoadingState(true);
     await signIn();
-    isLoading = false;
-    update();
+    setLoadingState(false);
   }
 }

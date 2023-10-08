@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logging/logging.dart';
 
 /// Utility to display [message] as a toast.
 void showToast(String title, String message) {
@@ -44,3 +46,14 @@ DateTime getLastDayOfMonth(DateTime dateTime) {
 String getInitials(String name) => name.isNotEmpty
     ? name.trim().split(RegExp(' +')).map((s) => s[0]).take(2).join()
     : '';
+
+final log = Logger("Logs");
+
+void configureLogger(){
+  Logger.root.level = Level.ALL; // defaults to Level.INFO
+  Logger.root.onRecord.listen((record) {
+    if (kDebugMode) {
+      print('${record.level.name}: ${record.time}: ${record.message}');
+    }
+  });
+}

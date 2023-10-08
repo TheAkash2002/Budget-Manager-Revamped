@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controller/home_controller.dart';
+import 'custom_components.dart';
 import 'nav_drawer.dart';
 
 class Home extends StatelessWidget {
@@ -16,7 +17,12 @@ class Home extends StatelessWidget {
           actions: _.currentEntry.actions,
         ),
         drawer: const NavDrawer(),
-        body: _.currentEntry.widget,
+        body: Stack(
+          children: [
+            _.currentEntry.widget,
+            if (_.isLoading) const Loading(),
+          ],
+        ),
         floatingActionButton: _.currentEntry.fab,
       ),
     );

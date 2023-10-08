@@ -48,6 +48,8 @@ dependencies:
   google_fonts: ^6.1.0
   stream_transform: ^2.1.0
   loading_animation_widget: ^1.2.0+4
+  fl_chart: ^0.64.0
+  logging: ^1.2.0
 
 dev_dependencies:
   flutter_test:

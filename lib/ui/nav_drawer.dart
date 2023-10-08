@@ -1,4 +1,3 @@
-import 'package:budget_manager_revamped/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,6 +5,7 @@ import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
 import '../controller/home_controller.dart';
 import '../controller/targets_controller.dart';
+import '../utils/utils.dart';
 import 'insert_edit_expense_dialog.dart';
 import 'insert_edit_target_dialog.dart';
 

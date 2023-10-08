@@ -11,8 +11,10 @@ import 'firebase_options.dart';
 import 'notification/notification_service.dart';
 import 'ui/home_page.dart';
 import 'ui/login_page.dart';
+import 'utils/utils.dart';
 
 void main() async {
+  configureLogger();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

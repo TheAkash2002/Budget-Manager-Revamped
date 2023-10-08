@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../auth/auth.dart';
 import '../ui/expenses_page.dart';
 import '../ui/list_filter.dart';
-import '../ui/targets_page.dart';
 import '../ui/nav_drawer.dart';
+import '../ui/targets_page.dart';
 
 enum HomeScreen { expenses, targets, logout, settings }
 
@@ -36,17 +36,15 @@ class HomeController extends GetxController {
   }
 
   Future<void> signOutUser() async {
-    isLoading = true;
-    update();
+    setLoadingState(true);
     await signOut();
-    isLoading = false;
-    update();
+    setLoadingState(false);
   }
 
   static List<HomeNavigationEntry> navEntries = [
     HomeNavigationEntry(
       screen: HomeScreen.expenses,
-      widget: Expenses(),
+      widget: const Expenses(),
       screenTitle: "Expenses",
       actions: [
         IconButton(
@@ -109,7 +107,5 @@ class HomeNavigationEntry {
       required this.drawerTitle,
       void Function()? onTap})
       : onDrawerTap =
-            onTap ?? (() => Get.find<HomeController>().setScreen(screen)) {
-    ;
-  }
+            onTap ?? (() => Get.find<HomeController>().setScreen(screen));
 }

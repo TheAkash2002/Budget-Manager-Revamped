@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import '../auth/auth.dart';
+import '../controller/home_controller.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../ui/confirm_insert_without_target_dialog.dart';
@@ -12,8 +13,6 @@ import '../ui/insert_edit_expense_dialog.dart';
 import '../utils/utils.dart';
 
 class ExpenseController extends GetxController {
-  bool isLoading = false;
-
   late TextEditingController amountController,
       categoryController,
       descriptionController;
@@ -50,6 +49,7 @@ class ExpenseController extends GetxController {
   }
 
   void createExpense(BuildContext context, ExpenseDialogMode mode) async {
+    setLoadingState(true);
     if (await validateExpenseDialog(mode)) {
       Expense newExpense = Expense(
         id: "",
@@ -61,15 +61,13 @@ class ExpenseController extends GetxController {
         lastEdit: DateTime.now(),
       );
       await insertExpense(newExpense);
-      if (context.mounted) {
-        Navigator.of(context).pop(true);
-      }
       showToast("Success", "Inserted expense successfully!");
-      //refreshExpensesList();
     }
+    setLoadingState(false);
   }
 
   void editExpense(BuildContext context, ExpenseDialogMode mode) async {
+    setLoadingState(true);
     if (await validateExpenseDialog(mode)) {
       currentExpense!.amount = double.tryParse(amountController.text)!;
       currentExpense!.category = categoryController.text;
@@ -78,17 +76,15 @@ class ExpenseController extends GetxController {
       currentExpense!.date = pickerDate;
       currentExpense!.lastEdit = DateTime.now();
       await updateExpense(currentExpense!);
-      if (context.mounted) {
-        Navigator.of(context).pop(true);
-      }
       showToast("Success", "Updated expense successfully!");
-      //refreshExpensesList();
     }
+    setLoadingState(false);
   }
 
   void removeExpense(String expenseId) async {
+    setLoadingState(true);
     await deleteExpense(expenseId);
-    //refreshExpensesList();
+    setLoadingState(false);
   }
 
   Future<void> refreshInsertEditExpenseControllers() async {
@@ -116,6 +112,10 @@ class ExpenseController extends GetxController {
     }
 
     bool isEditMode = mode == ExpenseDialogMode.edit;
+
+    if (Get.context!.mounted) {
+      Navigator.of(Get.context!).pop(true);
+    }
 
     if (!(await isTargetSet(pickerDate))) {
       bool? confirmInsertWithoutTarget = await showDialog<bool?>(
@@ -244,10 +244,8 @@ class ExpenseController extends GetxController {
     Navigator.of(Get.context!).pop(true);
   }
 
-  void setLoadingState(bool newState) {
-    isLoading = newState;
-    update();
-  }
+  void setLoadingState(bool newState) =>
+      Get.find<HomeController>().setLoadingState(newState);
 }
 
 class FilterState {

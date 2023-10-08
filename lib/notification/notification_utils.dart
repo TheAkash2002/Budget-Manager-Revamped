@@ -1,4 +1,4 @@
-import 'package:budget_manager_revamped/models/models.dart';
+import '../models/models.dart';
 
 const String MESSAGER_PACKAGE = "com.google.android.apps.messaging";
 const String PAYTM_PACKAGE = "net.one97.paytm";
@@ -72,7 +72,7 @@ class CapturedNotification {
       }
     }
 
-    if (isAmountSuspicious()){
+    if (isAmountSuspicious()) {
       type = CapturedNotificationType.UNKNOWN;
     }
   }
@@ -100,7 +100,7 @@ class CapturedNotification {
 
   //TODO: Refine
   double getAmount() {
-    if(_amount != null) {
+    if (_amount != null) {
       return _amount!;
     }
     double result = -1;
@@ -140,7 +140,8 @@ class CapturedNotification {
     return _amount!;
   }
 
-  bool isAmountSuspicious() => getAmount() == -1 || getAmount() >= AMOUNT_THRESHOLD;
+  bool isAmountSuspicious() =>
+      getAmount() == -1 || getAmount() >= AMOUNT_THRESHOLD;
 
   String getDescription() {
     switch (type) {

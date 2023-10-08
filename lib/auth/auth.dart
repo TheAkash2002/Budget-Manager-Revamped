@@ -46,7 +46,7 @@ Future<void> signIn() async {
     }
   } catch (e) {
     showToast("Error", "Some error occured.");
-    print(e);
+    log.severe(e);
   }
 }
 

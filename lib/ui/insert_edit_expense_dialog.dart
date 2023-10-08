@@ -1,9 +1,9 @@
-import 'package:budget_manager_revamped/controller/expense_controller.dart';
-import 'package:budget_manager_revamped/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../controller/expense_controller.dart';
+import '../models/models.dart';
 import '../utils/utils.dart';
 
 enum ExpenseDialogMode { insert, edit }

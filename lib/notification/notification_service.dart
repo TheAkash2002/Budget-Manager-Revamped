@@ -10,6 +10,7 @@ import '../db/firestore_helper.dart';
 import '../firebase_options.dart';
 import '../models/models.dart';
 import '../notification/notification_utils.dart';
+import '../utils/utils.dart';
 
 final FlutterLocalNotificationsPlugin plugin =
     FlutterLocalNotificationsPlugin();
@@ -66,6 +67,7 @@ Future<bool> getNecessaryPermissions() async {
 
 @pragma('vm:entry-point')
 void dbEntryFunction() async {
+  configureLogger();
   const MethodChannel _backgroundChannel =
       MethodChannel('princeAkash/background');
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,7 +92,7 @@ void dbEntryFunction() async {
             "Added expense: Rs.${amount.toString()}", "Success!", newId);
       }
     } on Exception catch (e) {
-      print(e);
+      log.severe(e);
     }
   });
   _backgroundChannel.invokeMethod('NotificationPropagationService.initialized');
@@ -98,6 +100,7 @@ void dbEntryFunction() async {
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse response) async {
+  configureLogger();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

@@ -5,10 +5,9 @@ import '../auth/auth.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
+import 'home_controller.dart';
 
 class TargetsController extends GetxController {
-  bool isLoading = false;
-
   late TextEditingController amountController;
   late DateTime pickerDate;
   late Stream<List<Target>> targetStream = const Stream<List<Target>>.empty();
@@ -44,25 +43,31 @@ class TargetsController extends GetxController {
   }
 
   void createTarget(BuildContext context) async {
-    if (await isTargetSet(pickerDate)) {
-      showToast("Warning", "Target already exists for given month and year!");
-      return;
-    }
-
-    if (validateTargetDialog()) {
-      Target newTarget = Target(
-        id: "",
-        amount: double.tryParse(amountController.text)!,
-        date: getFirstDayOfMonth(pickerDate),
-        lastEdit: DateTime.now(),
-      );
-      await insertTarget(newTarget);
+    setLoadingState(true);
+    try {
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
-      showToast("Success", "Inserted target successfully!");
-      //refreshTargetsList();
+      if (await isTargetSet(pickerDate)) {
+        showToast("Warning", "Target already exists for given month and year!");
+        throw Exception("Target already exists");
+      }
+
+      if (validateTargetDialog()) {
+        Target newTarget = Target(
+          id: "",
+          amount: double.tryParse(amountController.text)!,
+          date: getFirstDayOfMonth(pickerDate),
+          lastEdit: DateTime.now(),
+        );
+        await insertTarget(newTarget);
+
+        showToast("Success", "Inserted target successfully!");
+      }
+    } catch (e) {
+      log.severe(e);
     }
+    setLoadingState(false);
   }
 
   void editTarget(BuildContext context) async {
@@ -70,18 +75,21 @@ class TargetsController extends GetxController {
       currentTarget!.amount = double.tryParse(amountController.text)!;
       currentTarget!.date = getFirstDayOfMonth(pickerDate);
       currentTarget!.lastEdit = DateTime.now();
-      await updateTarget(currentTarget!);
+      setLoadingState(true);
       if (context.mounted) {
         Navigator.of(context).pop(true);
       }
+      await updateTarget(currentTarget!);
       showToast("Success", "Updated target successfully!");
-      //refreshTargetsList();
+      setLoadingState(false);
     }
   }
 
   void removeTarget(String expenseId) async {
+    setLoadingState(true);
     await deleteTarget(expenseId);
-    //refreshTargetsList();
+    showToast("Success", "Deleted target successfully!");
+    setLoadingState(false);
   }
 
   bool validateTargetDialog() {
@@ -98,8 +106,6 @@ class TargetsController extends GetxController {
     update();
   }
 
-  void setLoadingState(bool newState) {
-    isLoading = newState;
-    update();
-  }
+  void setLoadingState(bool newState) =>
+      Get.find<HomeController>().setLoadingState(newState);
 }
