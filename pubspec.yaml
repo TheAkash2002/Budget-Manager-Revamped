@@ -50,6 +50,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   fl_chart: ^0.64.0
   logging: ^1.2.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

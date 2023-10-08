@@ -1,8 +1,6 @@
-import 'package:budget_manager_revamped/notification/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'controller/auth_controller.dart';
 import 'controller/expense_controller.dart';
@@ -29,7 +27,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Budget Manager - Revamped',
-      theme: _themeData(),
+      theme: loadThemeData(),
+      themeMode: ThemeMode.light,
       initialRoute: '/login',
       getPages: [
         GetPage(
@@ -50,13 +49,5 @@ class MyApp extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  ThemeData _themeData() {
-    var baseTheme = ThemeData(
-      primarySwatch: Colors.deepPurple,
-    );
-    return baseTheme.copyWith(
-        textTheme: GoogleFonts.latoTextTheme(baseTheme.textTheme));
   }
 }

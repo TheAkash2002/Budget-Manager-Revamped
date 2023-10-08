@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 
 /// Utility to display [message] as a toast.
@@ -49,7 +51,7 @@ String getInitials(String name) => name.isNotEmpty
 
 final log = Logger("Logs");
 
-void configureLogger(){
+void configureLogger() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) {
     if (kDebugMode) {
@@ -57,3 +59,29 @@ void configureLogger(){
     }
   });
 }
+
+ThemeData applyFont(ThemeData baseTheme) => baseTheme.copyWith(
+    textTheme: GoogleFonts.latoTextTheme(baseTheme.textTheme));
+
+void changeTheme(MaterialColor color) {
+  GetStorage('Theme').write("color", themeBaseColors.indexOf(color));
+  Get.changeTheme(applyFont(ThemeData(primarySwatch: color)));
+}
+
+ThemeData loadThemeData() {
+  int index = GetStorage("Theme").read("color") ?? 0;
+  return applyFont(ThemeData(primarySwatch: themeBaseColors[index]));
+}
+
+List<MaterialColor> themeBaseColors = [
+  Colors.deepPurple,
+  Colors.green,
+  Colors.blue,
+  Colors.amber,
+  Colors.deepOrange,
+  Colors.pink,
+  Colors.brown,
+  Colors.lime,
+  Colors.teal,
+  Colors.cyan,
+];
