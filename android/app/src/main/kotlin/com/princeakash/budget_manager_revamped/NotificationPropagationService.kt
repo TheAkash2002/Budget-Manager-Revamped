@@ -48,7 +48,7 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
         private var sBackgroundFlutterEngine: FlutterEngine? = null
 
         @JvmStatic
-        private val sServiceStarted = AtomicBoolean(false)
+        private val sBackgroundEngineInitiated = AtomicBoolean(false)
 
         @JvmStatic
         private lateinit var sPluginRegistrantCallback: PluginRegistrantCallback
@@ -66,25 +66,27 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
 
     private fun startPropagationService(context: Context) {
         Log.e(TAG, "In startPropagationService")
-        synchronized(sServiceStarted) {
+        synchronized(sBackgroundEngineInitiated) {
             Log.e(TAG, "Inside synchro startPropagationService")
             mContext = context
             if (sBackgroundFlutterEngine == null) {
                 sBackgroundFlutterEngine = FlutterEngine(context)
 
-                val dbEntryHandle = context.getSharedPreferences(
+                val setupBackgroundChannelForDbEntryHandle = context.getSharedPreferences(
                     MainActivity.SHARED_PREFERENCES_KEY,
                     Context.MODE_PRIVATE
-                ).getLong(MainActivity.DB_ENTRY_HANDLE_KEY, 0)
-                if (dbEntryHandle == 0L) {
-                    Log.e(TAG, "Fatal: no dbEntryFunction registered")
+                ).getLong(MainActivity.SETUP_BACKGROUND_CHANNEL_FOR_DB_ENTRY_HANDLE_KEY, 0)
+                if (setupBackgroundChannelForDbEntryHandle == 0L) {
+                    Log.e(TAG, "Fatal: no setupBackgroundChannelForDbEntry method registered")
                     return
                 }
 
-                val dbEntryInfo =
-                    FlutterCallbackInformation.lookupCallbackInformation(dbEntryHandle)
-                if (dbEntryInfo == null) {
-                    Log.e(TAG, "Fatal: failed to find dbEntryFunction")
+                val setupBackgroundChannelForDbEntryCallbackInfo =
+                    FlutterCallbackInformation.lookupCallbackInformation(
+                        setupBackgroundChannelForDbEntryHandle
+                    )
+                if (setupBackgroundChannelForDbEntryCallbackInfo == null) {
+                    Log.e(TAG, "Fatal: failed to find setupBackgroundChannelForDbEntry method")
                     return
                 }
                 Log.i(TAG, "Starting NotificationPropagationService...")
@@ -92,7 +94,7 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
                 val args = DartCallback(
                     context.getAssets(),
                     FlutterMain.findAppBundlePath(context)!!,
-                    dbEntryInfo
+                    setupBackgroundChannelForDbEntryCallbackInfo
                 )
                 sBackgroundFlutterEngine!!.getDartExecutor().executeDartCallback(args)
                 Log.e(TAG, "Connected to Flutter")
@@ -113,16 +115,17 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "NotificationPropagationService.initialized" -> {
-                synchronized(sServiceStarted) {
+                synchronized(sBackgroundEngineInitiated) {
                     Log.e(TAG, "Inside synchro onMethodCall")
                     while (!queue.isEmpty()) {
                         Log.e(TAG, "Dequeing via ${mBackgroundChannel.toString()}");
                         mBackgroundChannel.invokeMethod("", queue.remove())
                     }
-                    sServiceStarted.set(true)
+                    sBackgroundEngineInitiated.set(true)
                     Log.e(TAG, "Leaving synchro onMethodCall")
                 }
             }
+
             else -> result.notImplemented()
         }
         result.success(null)
@@ -143,9 +146,9 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
 
         Log.e(TAG, "wasNotif?${notificationUpdateList}")
         Log.e(TAG, this.toString())
-        synchronized(sServiceStarted) {
+        synchronized(sBackgroundEngineInitiated) {
             Log.e(TAG, "Inside synchro onHandleWork")
-            if (!sServiceStarted.get()) {
+            if (!sBackgroundEngineInitiated.get()) {
                 // Queue up notification events while background isolate is starting
                 Log.e(TAG, "Queuing");
                 queue.add(notificationUpdateList)

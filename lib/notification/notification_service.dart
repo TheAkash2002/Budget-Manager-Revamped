@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../db/firestore_helper.dart';
 import '../firebase_options.dart';
@@ -22,52 +21,51 @@ const AndroidNotificationDetails androidNotificationDetails =
         priority: Priority.high,
         ticker: 'ticker',
         actions: <AndroidNotificationAction>[
-      AndroidNotificationAction("del", "Delete")
+      AndroidNotificationAction("del", "Delete"),
     ]);
 const NotificationDetails notificationDetails =
     NotificationDetails(android: androidNotificationDetails);
 
-Future<void> initializeNotificationService() async {
-  //await getNecessaryPermissions();
-  final CallbackHandle? callback =
-      PluginUtilities.getCallbackHandle(dbEntryFunction);
-  await const MethodChannel('princeAkash/main').invokeMethod(
-      'NotificationListener.initializeService',
-      <dynamic>[callback!.toRawHandle()]);
+const MethodChannel mainMethodChannel = MethodChannel('princeAkash/main');
 
-  // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+Future<void> initializeNotificationServices() async {
+  await initializeNotificationReaderService();
+  await initializeNotificationSenderService();
+}
+
+Future<dynamic> hasPermissions() =>
+    mainMethodChannel.invokeMethod('checkAllPermissions');
+
+Future<void> getNecessaryPermissions() =>
+    mainMethodChannel.invokeMethod('requestAllPermissions');
+
+void setMainMethodChannelCallHandler(
+        Future<dynamic> Function(MethodCall) handler) =>
+    mainMethodChannel.setMethodCallHandler(handler);
+
+Future<bool?> initializeNotificationReaderService() async {
+  final CallbackHandle? callbackHandle =
+      PluginUtilities.getCallbackHandle(setupBackgroundChannelForDbEntry);
+  return mainMethodChannel.invokeMethod<bool>(
+      'initializeService', <dynamic>[callbackHandle!.toRawHandle()]);
+}
+
+Future<void> initializeNotificationSenderService() async {
+// initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+  configureLogger();
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('launch_background');
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
+  log.warning(plugin.hashCode);
   await plugin.initialize(initializationSettings,
-      /*onDidReceiveNotificationResponse:
-        (NotificationResponse notificationResponse) async {
-      // ...
-    },*/
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
-}
-
-Future<bool> getNecessaryPermissions() async {
-  while (!(await Permission.accessNotificationPolicy.request()).isGranted) {
-    if ((await Permission.accessNotificationPolicy.status)
-        .isPermanentlyDenied) {
-      return false;
-    }
-  }
-  while (!(await Permission.sms.request()).isGranted) {
-    if ((await Permission.sms.status).isPermanentlyDenied) {
-      openAppSettings();
-      return false;
-    }
-  }
-  return true;
+  log.warning("Initted");
 }
 
 @pragma('vm:entry-point')
-void dbEntryFunction() async {
-  configureLogger();
+void setupBackgroundChannelForDbEntry() async {
   const MethodChannel _backgroundChannel =
       MethodChannel('princeAkash/background');
   WidgetsFlutterBinding.ensureInitialized();
@@ -100,8 +98,6 @@ void dbEntryFunction() async {
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse response) async {
-  configureLogger();
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -127,5 +123,6 @@ Future<List> insertExpenseFromCapturedNotification(
 }
 
 void dispatchNotification(String title, String message, String newId) async {
+  log.warning(plugin.hashCode);
   await plugin.show(id++, title, message, notificationDetails, payload: newId);
 }

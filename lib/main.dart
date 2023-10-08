@@ -1,3 +1,4 @@
+import 'package:budget_manager_revamped/notification/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,6 @@ import 'controller/expense_controller.dart';
 import 'controller/home_controller.dart';
 import 'controller/targets_controller.dart';
 import 'firebase_options.dart';
-import 'notification/notification_service.dart';
 import 'ui/home_page.dart';
 import 'ui/login_page.dart';
 import 'utils/utils.dart';
@@ -20,7 +20,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
-  initializeNotificationService();
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Budget Manager - Revamped',
       theme: _themeData(),
-      initialRoute: '/',
+      initialRoute: '/login',
       getPages: [
         GetPage(
           name: '/login',

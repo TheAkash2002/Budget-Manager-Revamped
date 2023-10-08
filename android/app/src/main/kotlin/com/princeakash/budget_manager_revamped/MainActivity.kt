@@ -29,36 +29,66 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.embedding.engine.FlutterEngine
 
-class MainActivity: FlutterActivity() {
-    companion object{
+class MainActivity : FlutterActivity() {
+    lateinit var mFlutterEngine: FlutterEngine;
+
+    companion object {
         @JvmStatic
         val TAG = "MainActivity"
+
         @JvmStatic
         val SHARED_PREFERENCES_KEY = "notification_propagation_cache"
+
         @JvmStatic
-        val DB_ENTRY_HANDLE_KEY = "db_entry_handler"
+        val SETUP_BACKGROUND_CHANNEL_FOR_DB_ENTRY_HANDLE_KEY =
+            "setup_background_channel_for_db_entry_handler"
+
         @JvmStatic
         val MAIN_CHANNEL_TAG = "princeAkash/main"
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MAIN_CHANNEL_TAG).setMethodCallHandler {
-                call, result ->
-            // This method is invoked on the main thread.
-            val args = call.arguments<ArrayList<*>>()
-            if(call.method == "NotificationListener.initializeService"){
-                requestPermissions(arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.POST_NOTIFICATIONS), 12312)
-                if(permissionGranted()){
-                    initializeService(args)
-                    result.success(true)
-                }else{
-                    requestPermission()
-                    Log.e(TAG, "Failed to start notification tracking; Permissions were not yet granted.")
-                    result.success(false)
+        mFlutterEngine = flutterEngine;
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger, MAIN_CHANNEL_TAG
+        ).setMethodCallHandler { call, result ->
+
+            when (call.method) {
+                "initializeService" -> {
+                    if (permissionGranted()) {
+                        val args = call.arguments<ArrayList<*>>()
+                        initializeService(args)
+                        result.success(true)
+                    } else {
+                        Log.e(
+                            TAG,
+                            "Failed to start notification tracking; Permissions were not yet granted."
+                        )
+                        result.success(false)
+                    }
                 }
-            }else{
-                result.notImplemented()
+
+                "checkAllPermissions" -> {
+                    result.success(permissionGranted());
+                }
+
+                "requestAllPermissions" -> {
+                    requestPermissions(
+                        arrayOf(
+                            Manifest.permission.RECEIVE_SMS, Manifest.permission.POST_NOTIFICATIONS
+                        ), 12312
+                    )
+                    requestNotifReadingPermission();
+                }
+
+                "requestNotifReadingPermission" -> {
+                    requestNotifReadingPermission();
+                }
+
+                else -> {
+                    result.notImplemented()
+                }
             }
         }
     }
@@ -66,10 +96,8 @@ class MainActivity: FlutterActivity() {
     private fun initializeService(args: ArrayList<*>?) {
         Log.d(TAG, "Initializing NotificationPropagationService")
         val callbackHandle = args!![0] as Long
-        getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
-            .edit()
-            .putLong(DB_ENTRY_HANDLE_KEY, callbackHandle)
-            .apply()
+        getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE).edit()
+            .putLong(SETUP_BACKGROUND_CHANNEL_FOR_DB_ENTRY_HANDLE_KEY, callbackHandle).apply()
 
         /*val intentFilter = IntentFilter()
         intentFilter.addAction(NotificationListener.NOTIFICATION_INTENT)
@@ -82,10 +110,13 @@ class MainActivity: FlutterActivity() {
     }
 
     private fun permissionGranted(): Boolean {
+        val smsAndNotifPost =
+            (checkSelfPermission(Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED) && (checkSelfPermission(
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED);
         val packageName: String? = context.getPackageName()
         val flat: String? = Settings.Secure.getString(
-            context.getContentResolver(),
-            "enabled_notification_listeners"
+            context.getContentResolver(), "enabled_notification_listeners"
         )
         if (!TextUtils.isEmpty(flat)) {
             val names: List<String> = flat!!.split(":")
@@ -94,19 +125,38 @@ class MainActivity: FlutterActivity() {
                 val nameMatch: Boolean =
                     TextUtils.equals(packageName!!, componentName!!.getPackageName())
                 if (nameMatch) {
-                    return true
+                    return smsAndNotifPost;
                 }
             }
         }
         return false
     }
 
-    fun requestPermission() {
+    fun requestNotifReadingPermission() {
         /// Sort out permissions for notifications
         if (!permissionGranted()) {
             val permissionScreen = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
             permissionScreen.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(permissionScreen)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        code: Int, permissions: Array<String>, results: IntArray
+    ) {
+        if (code == 12312) {
+            if (results.find { it == PackageManager.PERMISSION_DENIED } == null) {
+                Log.e(TAG, "No result was denied.");
+                MethodChannel(
+                    mFlutterEngine.dartExecutor.binaryMessenger, MAIN_CHANNEL_TAG
+                ).invokeMethod("permissionsGranted", null);
+            } else {
+                if (permissions.size > 0) {
+                    Log.e(TAG, permissions[0] + permissions[1]);
+                    Log.e(TAG, "${results[0]} + ${results[1]}");
+                }
+                Log.e(TAG, "Some result was denied.");
+            }
         }
     }
 }
