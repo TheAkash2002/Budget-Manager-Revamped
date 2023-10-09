@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../auth/auth.dart';
+import '../ui/bar_pie_chart_page.dart';
 import '../ui/expenses_page.dart';
 import '../ui/list_filter.dart';
 import '../ui/nav_drawer.dart';
+import '../ui/relative_change_screen.dart';
 import '../ui/settings_page.dart';
 import '../ui/targets_page.dart';
 
-enum HomeScreen { expenses, targets, logout, settings }
+enum HomeScreen {
+  expenses,
+  targets,
+  logout,
+  settings,
+  bar_pie,
+  relative_change
+}
 
 class HomeController extends GetxController {
   bool isLoading = false;
@@ -75,6 +84,22 @@ class HomeController extends GetxController {
       ),
       drawerIcon: const Icon(Icons.check_box_outlined),
       drawerTitle: "Targets",
+    ),
+    HomeNavigationEntry(
+      screen: HomeScreen.bar_pie,
+      widget: const BarPieChart(),
+      screenTitle: "Bar / Pie Chart",
+      actions: [],
+      drawerIcon: const Icon(Icons.add_chart),
+      drawerTitle: "Bar / Pie Chart",
+    ),
+    HomeNavigationEntry(
+      screen: HomeScreen.relative_change,
+      widget: const RelativeChange(),
+      screenTitle: "Line Chart",
+      actions: [],
+      drawerIcon: const Icon(Icons.multiline_chart),
+      drawerTitle: "Line Chart",
     ),
     HomeNavigationEntry(
       screen: HomeScreen.settings,
