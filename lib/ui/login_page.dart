@@ -10,6 +10,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
+      init: AuthController(),
       builder: (_) => Scaffold(
           backgroundColor: Theme.of(context).colorScheme.primary,
           body: Stack(children: [

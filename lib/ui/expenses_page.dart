@@ -14,6 +14,7 @@ class Expenses extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExpenseController>(
+      init: ExpenseController(),
       builder: (_) => StreamBuilder<List<Expense>>(
           stream: _.paymentStream,
           builder: (context, snapshot) {
@@ -60,7 +61,7 @@ class ExpenseItem extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RowWidget("Amount: ${expense.amount}"),
+                  RowWidget("Amount: ₹${expense.amount}"),
                   RowWidget("Category: ${expense.category}"),
                   RowWidget(
                       "Type: ${toExpenseDirectionUIString(expense.direction)}"),
@@ -131,7 +132,7 @@ class ExpenseDetailsDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RowWidget("Amount: ${expense.amount}"),
+          RowWidget("Amount: ₹${expense.amount}"),
           RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
           RowWidget("Category: ${expense.category}"),
           RowWidget("Description: ${expense.description}"),

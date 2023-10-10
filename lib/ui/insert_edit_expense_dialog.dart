@@ -35,7 +35,10 @@ class InsertEditExpenseDialog extends StatelessWidget {
                   autofocus: true,
                   controller: _.amountController,
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), labelText: "Amount"),
+                    prefixText: "₹",
+                    border: OutlineInputBorder(),
+                    labelText: "Amount",
+                  ),
                 ),
               ),
               RawAutocomplete<String>(

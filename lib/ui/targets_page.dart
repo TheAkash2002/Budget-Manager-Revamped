@@ -14,6 +14,7 @@ class Targets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<TargetsController>(
+      init: TargetsController(),
       builder: (_) => StreamBuilder<List<Target>>(
           stream: _.targetStream,
           builder: (context, snapshot) {
@@ -58,8 +59,8 @@ class TargetItem extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                RowWidget("Amount: ${target.amount}"),
-                RowWidget("Date: ${DateFormat.yM().format(target.date)}"),
+                RowWidget("Amount: ₹${target.amount}"),
+                RowWidget("Month: ${DateFormat.yMMMM().format(target.date)}"),
               ],
             ),
           ),

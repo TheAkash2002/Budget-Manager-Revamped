@@ -30,7 +30,10 @@ class InsertEditTargetDialog extends StatelessWidget {
                 autofocus: true,
                 controller: _.amountController,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), labelText: "Amount"),
+                  prefixText: "₹",
+                  border: OutlineInputBorder(),
+                  labelText: "Amount",
+                ),
               ),
               Padding(
                   padding:
@@ -42,9 +45,10 @@ class InsertEditTargetDialog extends StatelessWidget {
                       }
                     },
                     child: InputDecorator(
-                        decoration:  InputDecoration(
-                          enabled: mode == TargetDialogMode.insert,
-                            border: const OutlineInputBorder(), labelText: "Month"),
+                        decoration: InputDecoration(
+                            enabled: mode == TargetDialogMode.insert,
+                            border: const OutlineInputBorder(),
+                            labelText: "Month"),
                         child: Text(DateFormat.yMMMM().format(_.pickerDate))),
                   )),
             ],

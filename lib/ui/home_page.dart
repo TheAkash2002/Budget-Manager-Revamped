@@ -11,6 +11,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(
+      init: HomeController(),
       builder: (_) => Scaffold(
         appBar: AppBar(
           title: Text(_.currentEntry.screenTitle),

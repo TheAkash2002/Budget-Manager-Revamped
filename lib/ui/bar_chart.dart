@@ -19,7 +19,7 @@ class BarChartComponent extends StatelessWidget {
               dataSource: _.summary,
               xValueMapper: (data, _) => data.category,
               yValueMapper: (data, _) => data.expenseSum,
-              name: 'Gold',
+              name: 'Money',
             ),
           ]),
     );
