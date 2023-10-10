@@ -32,7 +32,23 @@ class ListFilter extends StatelessWidget {
                           _.onSelectExpenseDirectionChip(e, val)))
                   .toList(),
             ),
-            const SizedBox(height: 32.0),
+            const SizedBox(height: 15.0),
+            const Text(
+              'Categories',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10.0),
+            Wrap(
+              spacing: 5.0,
+              children: _.filterCategoryOptions
+                  .map((e) => FilterChip(
+                      label: Text(e ?? "All"),
+                      selected: (e == null && _.allowedCategories == null) ||
+                          (_.allowedCategories?.contains(e) ?? false),
+                      onSelected: (val) => _.onSelectCategory(e, val)))
+                  .toList(),
+            ),
+            const SizedBox(height: 15.0),
             const Text(
               'Date Range',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

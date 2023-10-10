@@ -21,6 +21,7 @@ class ExpenseController extends GetxController {
   Stream<List<Expense>> paymentStream = const Stream<List<Expense>>.empty();
 
   late List<String> allCategories;
+  List<String?> filterCategoryOptions = List<String?>.empty();
 
   Expense? currentExpense;
 
@@ -44,6 +45,12 @@ class ExpenseController extends GetxController {
     paymentStream = allExpensesStream()
         .combineLatest<FilterState, List<Expense>>(
             filterStreamController.stream, filterListUsingState);
+    allCategories = await getExistingCategoriesList();
+
+    final List<String?> augList = [null];
+    augList.addAll(allCategories.toSet());
+    filterCategoryOptions = augList;
+
     applyFilter();
     update();
   }
@@ -194,7 +201,24 @@ class ExpenseController extends GetxController {
 
   //Filter functions
   Set<ExpenseDirection> allowedDirections = ExpenseDirection.values.toSet();
+  Set<String>? allowedCategories;
   DateTime? filterStartDate, filterEndDate;
+
+  void onSelectCategory(String? category, bool selected) {
+    if (selected) {
+      if (category == null) {
+        allowedCategories = null;
+      } else {
+        allowedCategories ??= <String>{};
+        allowedCategories?.add(category);
+      }
+    } else {
+      if (category != null) {
+        allowedCategories?.remove(category);
+      }
+    }
+    update();
+  }
 
   void onSelectExpenseDirectionChip(ExpenseDirection ed, bool selected) {
     if (selected) {
@@ -220,7 +244,8 @@ class ExpenseController extends GetxController {
   void resetFilterEndDate() => setFilterEndDate(null);
 
   void applyFilter() => filterStreamController.add(FilterState(
-        allowed: allowedDirections,
+        allowedDirections: allowedDirections,
+        allowedCategories: allowedCategories,
         startDate: filterStartDate,
         endDate: filterEndDate,
       ));
@@ -230,7 +255,10 @@ class ExpenseController extends GetxController {
 
   List<Expense> filterListUsingState(List<Expense> list, FilterState state) {
     return list
-        .where((item) => state.allowed.contains(item.direction))
+        .where((item) => state.allowedDirections.contains(item.direction))
+        .where((item) =>
+            state.allowedCategories == null ||
+            state.allowedCategories!.contains(item.category))
         .where((item) =>
             state.startDate == null || item.date.isAfter(state.startDate!))
         .where((item) =>
@@ -249,8 +277,13 @@ class ExpenseController extends GetxController {
 }
 
 class FilterState {
-  Set<ExpenseDirection> allowed = {};
+  Set<ExpenseDirection> allowedDirections = {};
+  Set<String>? allowedCategories;
   DateTime? startDate, endDate;
 
-  FilterState({this.allowed = const {}, this.startDate, this.endDate});
+  FilterState(
+      {this.allowedDirections = const {},
+      this.startDate,
+      this.endDate,
+      this.allowedCategories});
 }
