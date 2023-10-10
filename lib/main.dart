@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'firebase_options.dart';
 import 'ui/home_page.dart';
 import 'ui/login_page.dart';
+import 'ui/splash_page.dart';
 import 'utils/utils.dart';
 
 void main() async {
@@ -25,8 +26,12 @@ class MyApp extends StatelessWidget {
       title: 'Budget Manager - Revamped',
       theme: loadThemeData(),
       themeMode: ThemeMode.light,
-      initialRoute: '/login',
+      initialRoute: '/splash',
       getPages: [
+        GetPage(
+          name: '/splash',
+          page: () => const Splash(),
+        ),
         GetPage(
           name: '/login',
           page: () => const Login(),

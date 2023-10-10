@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../db/firestore_helper.dart';
 import '../firebase_options.dart';
@@ -28,40 +29,73 @@ const NotificationDetails notificationDetails =
 
 const MethodChannel mainMethodChannel = MethodChannel('princeAkash/main');
 
-Future<void> initializeNotificationServices() async {
-  await initializeNotificationReaderService();
-  await initializeNotificationSenderService();
+/// Checks if Permissions verifiable from Flutter are granted or not.
+Future<bool> hasAllRequiredPermissions() async {
+  if (!await hasSmsPermission()) {
+    log.warning("No SMS permission");
+    return false;
+  }
+  if (!await hasNotifPostingPermission()) {
+    log.warning("No notif posting permission");
+    return false;
+  }
+  if (!(await hasNotifReadingPermission())!) {
+    log.warning("No notif reading permission");
+    return false;
+  }
+  return true;
 }
 
-Future<dynamic> hasPermissions() =>
-    mainMethodChannel.invokeMethod('checkAllPermissions');
+Future<bool> hasSmsPermission() => Permission.sms.status.isGranted;
 
-Future<void> getNecessaryPermissions() =>
-    mainMethodChannel.invokeMethod('requestAllPermissions');
+Future<bool> hasNotifPostingPermission() =>
+    Permission.notification.status.isGranted;
 
-void setMainMethodChannelCallHandler(
-        Future<dynamic> Function(MethodCall) handler) =>
-    mainMethodChannel.setMethodCallHandler(handler);
+Future<dynamic> hasNotifReadingPermission() =>
+    mainMethodChannel.invokeMethod('checkNotifReadingPermission');
 
-Future<bool?> initializeNotificationReaderService() async {
+Future<PermissionStatus> requestSmsPermission() => Permission.sms.request();
+
+Future<PermissionStatus> requestNotifPostingPermission() =>
+    Permission.notification.request();
+
+Future<void> requestNotifReadingPermission() =>
+    mainMethodChannel.invokeMethod('requestNotifReadingPermission');
+
+Future<bool> isSmsPermanentlyDenied() =>
+    Permission.sms.status.isPermanentlyDenied;
+
+Future<bool> isNotifPostingPermanentlyDenied() =>
+    Permission.notification.status.isPermanentlyDenied;
+
+Future<bool> initializeNotificationReaderService() async {
   final CallbackHandle? callbackHandle =
       PluginUtilities.getCallbackHandle(setupBackgroundChannelForDbEntry);
-  return mainMethodChannel.invokeMethod<bool>(
+  dynamic isInitialized = await mainMethodChannel.invokeMethod(
       'initializeService', <dynamic>[callbackHandle!.toRawHandle()]);
+  if (isInitialized != null && isInitialized == true) {
+    log.warning("Initialized service successfully.");
+    return true;
+  } else {
+    if (isInitialized == null) {
+      log.warning("Error in initialization");
+    } else {
+      log.warning(isInitialized);
+      log.warning("Initialization returned false.");
+    }
+  }
+  return false;
 }
 
 Future<void> initializeNotificationSenderService() async {
 // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
-  configureLogger();
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('launch_background');
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
-  log.warning(plugin.hashCode);
   await plugin.initialize(initializationSettings,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
-  log.warning("Initted");
 }
 
 @pragma('vm:entry-point')
@@ -71,6 +105,7 @@ void setupBackgroundChannelForDbEntry() async {
   WidgetsFlutterBinding.ensureInitialized();
   _backgroundChannel.setMethodCallHandler((MethodCall call) async {
     try {
+      WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
@@ -82,12 +117,10 @@ void setupBackgroundChannelForDbEntry() async {
       if (cn.isUnknown()) {
         return;
       }
-      List values = await insertExpenseFromCapturedNotification(cn);
-      double amount = values[0] as double;
-      String newId = values[1];
-      if (newId.isNotEmpty) {
-        dispatchNotification(
-            "Added expense: Rs.${amount.toString()}", "Success!", newId);
+      Expense? inserted = await insertExpenseFromCapturedNotification(cn);
+      if (inserted != null) {
+        dispatchNotification("Added expense: Rs.${inserted.amount.toString()}",
+            "Success!", inserted.id);
       }
     } on Exception catch (e) {
       log.severe(e);
@@ -98,6 +131,7 @@ void setupBackgroundChannelForDbEntry() async {
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse response) async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -106,7 +140,7 @@ void notificationTapBackground(NotificationResponse response) async {
   }
 }
 
-Future<List> insertExpenseFromCapturedNotification(
+Future<Expense?> insertExpenseFromCapturedNotification(
     CapturedNotification cn) async {
   DateTime current = DateTime.now();
   Expense newExpense = Expense(
@@ -118,11 +152,9 @@ Future<List> insertExpenseFromCapturedNotification(
     date: DateTime(current.year, current.month, current.day),
     lastEdit: DateTime.now(),
   );
-  String newId = await insertExpense(newExpense);
-  return [newExpense.amount, newId];
+  return await insertExpense(newExpense);
 }
 
 void dispatchNotification(String title, String message, String newId) async {
-  log.warning(plugin.hashCode);
   await plugin.show(id++, title, message, notificationDetails, payload: newId);
 }

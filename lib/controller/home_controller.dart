@@ -25,14 +25,6 @@ class HomeController extends GetxController {
       .where((element) => element.screen == HomeScreen.expenses)
       .toList()[0];
 
-  @override
-  void onInit() {
-    super.onInit();
-    if (!isLoggedIn()) {
-      navigateToLoginPage();
-    }
-  }
-
   void setLoadingState(bool newState) {
     isLoading = newState;
     update();

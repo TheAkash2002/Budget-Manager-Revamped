@@ -8,14 +8,19 @@ Notifications are interacted with in two ways:
 
 ## Reading Notifications
 
-1. main() calls initializeNotificationService()
-2. Request for SMS permission and "Show Notifications" permission
+1. SplashController Requests for SMS permission and "Show Notifications" permission locally using
+   permission_handler.
+2. SplashController calls hasNotifReadingPermission i.e. "checkNotifReadingPermission" method call
+   is made on platform through mainMethodChannel.
 3. A "princeAkash/main" MethodChannel is created and a function "initializeService" is called which
    takes a rawHandle as input.
 4. Android MainActivity has set up a handler for "princeAkash/main", where
-    - "initializeService" checks if Notification Reading permission is granted.
-    - If not granted, permission is requested
-    - if granted, initializeService() is called which starts NotificationListener service.
+    - "initializeService": If notifReadingPermissionGranted() returns true, it calls internal
+      initializeService() which starts NotificationListener service
+    - "checkNotifReadingPermission": Returns with a boolean stating whether the app is allowed to
+      listen to notifications or not.
+    - "requestNotifReadingPermission": Opens the Settings screen to allow the app to listen to
+      notifications.
 5. On receiving a Notification, NotificationListener.onNotificationPosted is fired. This sends out
    an intent aimed at NotificationBroadcastListener.
 6. On receiving an SMS, NotificationBroadcastReceiver gets fired due to AndroidManifest
@@ -25,8 +30,7 @@ Notifications are interacted with in two ways:
 8. NotificationPropagationService calls startPropagationService, which sets up a FlutterEngine and
    stores it in static variable.
 9. FlutterEngine setup involves finding a setupBackgroundChannelForDbEntry callback, executing it,
-   receiving a "NotificationPropagationService.initialized" MethodCall from it, dequeing all queued
-   payloads, and marking
+   receiving a "initialized" MethodCall from it, dequeing all queued payloads, and marking
    sBackgroundEngineInitiated as true.
 10. NotificationPropagationService.onHandleWork is called when the works fired by
     NotificationBroadcastReceiver can be dequeued.
@@ -37,4 +41,10 @@ Notifications are interacted with in two ways:
 
 ## Showing Notifications
 
-TBD
+1. Permission for showing notifications is requested in SplashController()
+2. SplashController() calls initializeNotificationSenderService().
+3. A handler for the background channel is written, for the callback to be executed when a
+   notification is captured and relayed by NotificationPropagationService. The callback prepares
+   firebase for expense creation / deletion.
+4. Whenever a useful notification is captured, a new notification is generated with details of the
+   captured expense as well as a button to delete it.

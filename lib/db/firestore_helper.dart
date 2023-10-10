@@ -86,12 +86,11 @@ Future<void> deleteTarget(String id) async {
   } catch (e) {}
 }
 
-Future<String> insertExpense(Expense expense) async {
+Future<Expense?> insertExpense(Expense expense) async {
   try {
-    final ref = await getExpenseTable().add(expense);
-    return ref.id;
+    return (await (await getExpenseTable().add(expense)).get()).data();
   } catch (e) {}
-  return "";
+  return null;
 }
 
 Future<List<Expense>> getAllExpenses() async {

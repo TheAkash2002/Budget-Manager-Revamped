@@ -25,31 +25,26 @@ class NotificationListener : NotificationListenerService() {
         val SBI_PACKAGE = "com.sbi.lotusintouch"
         val ICICI_PACKAGE = "com.csam.icici.bank.imobile"
         val TAG = "NotificationListener"
-        val allowedPackages = listOf(PAYTM_PACKAGE, PHONEPE_PACKAGE, GPAY_PACKAGE, SBI_PACKAGE, ICICI_PACKAGE)
+        val allowedPackages =
+            listOf(PAYTM_PACKAGE, PHONEPE_PACKAGE, GPAY_PACKAGE, SBI_PACKAGE, ICICI_PACKAGE)
     }
 
     override fun onNotificationPosted(notification: StatusBarNotification) {
         val packageName: String = notification.getPackageName()
         if (!Companion.allowedPackages.contains(packageName)) {
-            Log.e(TAG, "Notif from useless package, hence Broadcast not fired!")
             return
         }
 
-        /*Log.e(TAG, "Notif ID:" + notification.id)
-        Log.e(TAG, "Notif Key:" + notification.key)
-        Log.e(TAG, "Notif PostTime:" + notification.postTime)
-        Log.e(TAG, "Notif PackageName:" + packageName)*/
-
         val extras: Bundle? = notification.getNotification().extras
         if (extras != null) {
-            val intent = Intent(NOTIFICATION_INTENT, null, this, NotificationBroadcastReceiver::class.java)
+            val intent =
+                Intent(NOTIFICATION_INTENT, null, this, NotificationBroadcastReceiver::class.java)
             val title: CharSequence? = extras.getCharSequence(Notification.EXTRA_TITLE)
             val text: CharSequence? = extras.getCharSequence(Notification.EXTRA_TEXT)
             intent.putExtra(NOTIFICATION_PACKAGE_NAME, packageName)
             intent.putExtra(NOTIFICATION_TITLE, title?.toString())
             intent.putExtra(NOTIFICATION_MESSAGE, text?.toString())
             sendBroadcast(intent)
-            //Log.e(TAG, "Sent Broadcast!")
         }
     }
 }

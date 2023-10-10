@@ -64,17 +64,18 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
         }
     }
 
+    /**
+     * Setup sBackgroundFlutterEngine and establish two-way contact with Dart code on background
+     * channel.
+     */
     private fun startPropagationService(context: Context) {
-        Log.e(TAG, "In startPropagationService")
         synchronized(sBackgroundEngineInitiated) {
-            Log.e(TAG, "Inside synchro startPropagationService")
             mContext = context
             if (sBackgroundFlutterEngine == null) {
                 sBackgroundFlutterEngine = FlutterEngine(context)
 
                 val setupBackgroundChannelForDbEntryHandle = context.getSharedPreferences(
-                    MainActivity.SHARED_PREFERENCES_KEY,
-                    Context.MODE_PRIVATE
+                    MainActivity.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE
                 ).getLong(MainActivity.SETUP_BACKGROUND_CHANNEL_FOR_DB_ENTRY_HANDLE_KEY, 0)
                 if (setupBackgroundChannelForDbEntryHandle == 0L) {
                     Log.e(TAG, "Fatal: no setupBackgroundChannelForDbEntry method registered")
@@ -89,7 +90,6 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
                     Log.e(TAG, "Fatal: failed to find setupBackgroundChannelForDbEntry method")
                     return
                 }
-                Log.i(TAG, "Starting NotificationPropagationService...")
 
                 val args = DartCallback(
                     context.getAssets(),
@@ -100,29 +100,28 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
                 Log.e(TAG, "Connected to Flutter")
                 //IsolateHolderService.setBackgroundFlutterEngine(sBackgroundFlutterEngine)
             }
-            Log.e(TAG, "Leaving synchro startPropagationService")
         }
 
         mBackgroundChannel = MethodChannel(
             sBackgroundFlutterEngine!!.getDartExecutor().getBinaryMessenger(),
             BACKGROUND_CHANNEL_TAG
         )
-        Log.e(TAG, "Created mBackgroundChannel as ${mBackgroundChannel.toString()}")
         mBackgroundChannel.setMethodCallHandler(this)
-        Log.e(TAG, "Set ${this.toString()} as callHandler")
     }
 
+    /**
+     * Invoked after the Dart code responds back with an initiated event, indicating that the
+     * background channel method call handler to insert values into database has been set to
+     * monitor the subsequent background channel method calls.
+     */
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "NotificationPropagationService.initialized" -> {
                 synchronized(sBackgroundEngineInitiated) {
-                    Log.e(TAG, "Inside synchro onMethodCall")
                     while (!queue.isEmpty()) {
-                        Log.e(TAG, "Dequeing via ${mBackgroundChannel.toString()}");
                         mBackgroundChannel.invokeMethod("", queue.remove())
                     }
                     sBackgroundEngineInitiated.set(true)
-                    Log.e(TAG, "Leaving synchro onMethodCall")
                 }
             }
 
@@ -136,6 +135,11 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
         startPropagationService(this)
     }
 
+    /**
+     * Invoked when work received from NotificationBroadcastReceiver can be handled. If the
+     * sBackgroundFlutterEngine is not ready, work is queued. Otherwise, notification payload is
+     * relayed immediately to background channel.
+     */
     override fun onHandleWork(intent: Intent) {
         val isNotification: Boolean =
             (intent.action.equals(NotificationListener.NOTIFICATION_INTENT))
@@ -144,28 +148,22 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
                 intent
             )
 
-        Log.e(TAG, "wasNotif?${notificationUpdateList}")
-        Log.e(TAG, this.toString())
         synchronized(sBackgroundEngineInitiated) {
-            Log.e(TAG, "Inside synchro onHandleWork")
             if (!sBackgroundEngineInitiated.get()) {
                 // Queue up notification events while background isolate is starting
-                Log.e(TAG, "Queuing");
                 queue.add(notificationUpdateList)
             } else {
                 // Callback method name is intentionally left blank.
-                Log.e(TAG, "Immediate via ${mBackgroundChannel.toString()}");
                 Handler(mContext.mainLooper).post {
-                    mBackgroundChannel.invokeMethod(
-                        "",
-                        notificationUpdateList
-                    )
+                    mBackgroundChannel.invokeMethod("", notificationUpdateList)
                 }
             }
-            Log.e(TAG, "Leaving synchro onHandleWork")
         }
     }
 
+    /**
+     * Gets payload from text message through Intent.
+     */
     fun getUpdateListFromTextMessage(intent: Intent): List<String?> {
         val smsMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
         for (message in smsMessages) {
@@ -178,6 +176,9 @@ class NotificationPropagationService : MethodCallHandler, JobIntentService() {
         return listOf(NotificationListener.MESSAGER_PACKAGE, "None", "None")
     }
 
+    /**
+     * Gets payload from notification through Intent.
+     */
     fun getUpdateListFromNotification(intent: Intent): List<String?> {
         val packageName: String? =
             intent.getStringExtra(NotificationListener.NOTIFICATION_PACKAGE_NAME)
