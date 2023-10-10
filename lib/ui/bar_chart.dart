@@ -1,6 +1,6 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../controller/bar_pie_controller.dart';
 
@@ -10,54 +10,18 @@ class BarChartComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<BarPieController>(
-      builder: (_) => AspectRatio(
-        aspectRatio: 1,
-        child: BarChart(BarChartData(
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              tooltipBgColor: Colors.blueGrey,
-              tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-              tooltipMargin: -10,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                ChartData data = _.summary[group.x];
-                return BarTooltipItem(
-                  '${data.category}\n',
-                  const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: (rod.toY).toString(),
-                      style: TextStyle(
-                        color: Theme.of(Get.context!).colorScheme.primary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                );
-              },
+      builder: (_) => SfCartesianChart(
+          primaryXAxis: CategoryAxis(),
+          primaryYAxis: NumericAxis(),
+          tooltipBehavior: TooltipBehavior(enable: true),
+          series: <ChartSeries<ChartData, String>>[
+            BarSeries<ChartData, String>(
+              dataSource: _.summary,
+              xValueMapper: (data, _) => data.category,
+              yValueMapper: (data, _) => data.expenseSum,
+              name: 'Gold',
             ),
-          ),
-          titlesData: FlTitlesData(
-              show: true,
-              bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: _.getCategoryTitles,
-                reservedSize: 38,
-              ))),
-          borderData: FlBorderData(
-            show: false,
-          ),
-          barGroups: _.summary.map(_.makeBarGroupData).toList(),
-          gridData: const FlGridData(
-            show: false,
-          ),
-        )),
-      ),
+          ]),
     );
   }
 }

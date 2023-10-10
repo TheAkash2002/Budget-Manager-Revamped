@@ -1,6 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../db/firestore_helper.dart';
@@ -38,42 +36,6 @@ class BarPieController extends GetxController {
   void getChartData() {
     summary = filterList();
     update();
-  }
-
-  BarChartGroupData makeBarGroupData(ChartData data) {
-    int index = summary.indexOf(data);
-    return BarChartGroupData(
-      x: index,
-      barRods: [
-        BarChartRodData(
-          toY: data.expenseSum,
-          color: Theme.of(Get.context!).colorScheme.primary,
-          width: 22,
-        ),
-      ],
-    );
-  }
-
-  PieChartSectionData makePieSectionData(ChartData data) => PieChartSectionData(
-        color: Theme.of(Get.context!).colorScheme.primary,
-        value: data.expenseSum,
-        radius: 100,
-        title: "${data.category}\n${data.expenseSum}",
-      );
-
-  Widget getCategoryTitles(double value, TitleMeta meta) {
-    int index = value.toInt();
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 16,
-      child: Text(
-        categories[index],
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-      ),
-    );
   }
 
   //Filter functions
@@ -121,7 +83,9 @@ class BarPieController extends GetxController {
             allowedDirections.contains(item.direction) &&
             selectedCategories.contains(item.category))
         .where((item) =>
-            filterStartDate == null || item.date.isAfter(filterStartDate!))
+            filterStartDate == null ||
+            item.date
+                .isAfter(filterStartDate!.subtract(const Duration(seconds: 5))))
         .where((item) =>
             filterEndDate == null ||
             item.date.isBefore(filterEndDate!.add(const Duration(days: 1))));

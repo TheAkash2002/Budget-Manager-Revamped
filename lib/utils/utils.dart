@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -85,3 +86,23 @@ List<MaterialColor> themeBaseColors = [
   Colors.teal,
   Colors.cyan,
 ];
+
+Iterable<DateTime> daysInRange(DateTime start, DateTime end) sync* {
+  var i = start;
+  var offset = start.timeZoneOffset;
+  while (i.isBefore(end)) {
+    yield i;
+    i = i.add(Duration(days: 1));
+    var timeZoneDiff = i.timeZoneOffset - offset;
+    if (timeZoneDiff.inSeconds != 0) {
+      offset = i.timeZoneOffset;
+      i = i.subtract(Duration(seconds: timeZoneDiff.inSeconds));
+    }
+  }
+}
+
+Iterable<DateTime> monthsInRange(DateTime start, DateTime end){
+  Iterable<DateTime> days = daysInRange(start, end);
+  final map = groupBy<DateTime, DateTime>(days, (day) => DateTime(day.year, day.month));
+  return map.keys;
+}
