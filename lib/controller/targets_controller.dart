@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../auth/auth.dart';
@@ -27,14 +27,18 @@ class TargetsController extends GetxController {
   }
 
   void refreshInsertEditTargetControllers() {
+    setLoadingState(true);
     amountController.clear();
     pickerDate = DateTime.now();
+    setLoadingState(false);
   }
 
   void instantiateEditTargetControllers(Target target) {
+    setLoadingState(true);
     currentTarget = target;
     amountController.text = target.amount.toString();
     setPickerDate(target.date);
+    setLoadingState(false);
   }
 
   Future<void> refreshTargetStreamReference() async {

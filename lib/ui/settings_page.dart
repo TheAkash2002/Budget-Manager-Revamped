@@ -22,7 +22,7 @@ class Settings extends StatelessWidget {
               textAlign: TextAlign.start,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -37,21 +37,21 @@ class Settings extends StatelessWidget {
                       ))
                   .toList(),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             if (!kIsWeb) ...[
               const Text(
                 'App Permissions',
                 textAlign: TextAlign.start,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               ...Permissions.values
                   .map((perm) => PermissionWidget(permission: perm)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ElevatedButton(
                   onPressed: _.initializeReader,
-                  child: Text("Start Notification Tracking"),
+                  child: const Text("Start Notification Tracking"),
                 ),
               )
             ]
@@ -65,7 +65,7 @@ class Settings extends StatelessWidget {
 class PermissionWidget extends StatelessWidget {
   final Permissions permission;
 
-  PermissionWidget({super.key, required this.permission});
+  const PermissionWidget({super.key, required this.permission});
 
   @override
   Widget build(BuildContext context) {
@@ -88,14 +88,14 @@ class PermissionWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: ElevatedButton(
                       onPressed: () => _.refreshPermission(permission),
-                      child: Text("Refresh"),
+                      child: const Text("Refresh"),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: ElevatedButton(
                       onPressed: () => _.requestPermission(permission),
-                      child: Text("Request"),
+                      child: const Text("Request"),
                     ),
                   )
                 ],

@@ -21,33 +21,31 @@ const String colTargetDate = "Date";
 const String colTargetLastEdit = "LastEdit";
 const String colTargetUUID = "TargetUUID";
 
-String toExpenseDirectionString(ExpenseDirection direction) {
-  switch (direction) {
-    case ExpenseDirection.payment:
-      return PAYMENT;
-    case ExpenseDirection.loan_credit:
-      return LOAN_CREDIT;
-    case ExpenseDirection.loan_debit:
-      return LOAN_DEBIT;
-    default:
-      return "UNKNOWN";
+extension ExpenseDirectionStrings on ExpenseDirection {
+  String toExpenseDirectionString() {
+    switch (this) {
+      case ExpenseDirection.payment:
+        return PAYMENT;
+      case ExpenseDirection.loan_credit:
+        return LOAN_CREDIT;
+      case ExpenseDirection.loan_debit:
+        return LOAN_DEBIT;
+      default:
+        return "UNKNOWN";
+    }
   }
-}
 
-const String UI_PAYMENT = "Payment";
-const String UI_LOAN_CREDIT = "Credit";
-const String UI_LOAN_DEBIT = "Debit";
-
-String toExpenseDirectionUIString(ExpenseDirection direction) {
-  switch (direction) {
-    case ExpenseDirection.payment:
-      return UI_PAYMENT;
-    case ExpenseDirection.loan_credit:
-      return UI_LOAN_CREDIT;
-    case ExpenseDirection.loan_debit:
-      return UI_LOAN_DEBIT;
-    default:
-      return "Unknown";
+  String toExpenseDirectionUIString() {
+    switch (this) {
+      case ExpenseDirection.payment:
+        return "Payment";
+      case ExpenseDirection.loan_credit:
+        return "Credit";
+      case ExpenseDirection.loan_debit:
+        return "Debit";
+      default:
+        return "Unknown";
+    }
   }
 }
 
@@ -89,7 +87,7 @@ class Expense {
       colExpenseAmount: expense.amount,
       colExpenseDescription: expense.description,
       colExpenseCategory: expense.category,
-      colExpenseDirection: toExpenseDirectionString(expense.direction),
+      colExpenseDirection: expense.direction.toExpenseDirectionString(),
       colExpenseDate: expense.date.toIso8601String(),
       colExpenseLastEdit: expense.lastEdit.toIso8601String(),
     };

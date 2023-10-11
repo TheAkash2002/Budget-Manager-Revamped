@@ -1,3 +1,4 @@
+import 'package:budget_manager_revamped/controller/loading_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,14 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../auth/auth.dart';
 import '../notification/notification_service.dart';
 
-class SplashController extends GetxController {
-  bool isLoading = false;
-
-  void setLoadingState(bool newState) {
-    isLoading = newState;
-    update();
-  }
-
+class SplashController extends GetxController with LoadingMixin {
   @override
   void onInit() async {
     super.onInit();

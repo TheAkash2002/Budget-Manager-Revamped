@@ -5,16 +5,13 @@ import 'package:intl/intl.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
+import 'filter_mixin.dart';
 
-class RelativeChangeController extends GetxController {
-  List<String?> categories = List<String>.empty();
+class RelativeChangeController extends GetxController
+    with FilterControllerMixin {
   List<LineSeriesData> seriesSummary = List<LineSeriesData>.empty();
 
   List<Expense> masterExpenses = List<Expense>.empty();
-  String? selectedCategory;
-  Set<ExpenseDirection> allowedDirections = ExpenseDirection.values.toSet();
-  DateTime? filterStartDate = getFirstDayOfMonth(DateTime.now()),
-      filterEndDate = getLastDayOfMonth(DateTime.now());
   AggregateBy aggregateBy = AggregateBy.month;
 
   @override
@@ -25,59 +22,44 @@ class RelativeChangeController extends GetxController {
 
   void fetchExpenseData() async {
     masterExpenses = await getAllExpenses();
-    final List<String?> augList = [null];
-    augList.addAll(
-      masterExpenses.map<String>((expense) => expense.category).toSet(),
-    );
-    categories = augList;
-    selectedCategory = null;
-    getChartData();
+    List<String> categories = masterExpenses
+        .map<String>((expense) => expense.category)
+        .toSet()
+        .toList();
+    populateFilterCategoryOptions(categories);
+    triggerDataChange();
   }
 
-  void getChartData() {
+  @override
+  void triggerDataChange() {
     seriesSummary = filterAndGenerateSeriesSummary();
     update();
   }
 
   //Filter functions
-  void onSelectExpenseDirectionChip(ExpenseDirection ed, bool selected) {
-    if (selected) {
-      allowedDirections.add(ed);
-    } else {
-      allowedDirections.remove(ed);
-    }
-    getChartData();
-  }
 
+  @override
   void onSelectCategory(String? category, bool selected) {
     if (selected) {
-      selectedCategory = category;
+      if (category == null) {
+        allowedCategories = null;
+      } else {
+        allowedCategories ??= {};
+        allowedCategories!.clear();
+        allowedCategories!.add(category);
+      }
     } else {
-      if (category != null) {
-        selectedCategory = null;
+      if (allowedCategories != null) {
+        allowedCategories = null;
       }
     }
-    getChartData();
+    triggerDataChange();
   }
-
-  void setFilterStartDate(DateTime? dateTime) {
-    filterStartDate = dateTime;
-    getChartData();
-  }
-
-  void setFilterEndDate(DateTime? dateTime) {
-    filterEndDate = dateTime;
-    getChartData();
-  }
-
-  void resetFilterStartDate() => setFilterStartDate(null);
-
-  void resetFilterEndDate() => setFilterEndDate(null);
 
   void onSelectAggregateBy(AggregateBy e, bool value) {
     if (value == true) {
       aggregateBy = e;
-      getChartData();
+      triggerDataChange();
     }
   }
 
@@ -92,7 +74,8 @@ class RelativeChangeController extends GetxController {
     final allowedExpenses = masterExpenses
         .where((item) =>
             allowedDirections.contains(item.direction) &&
-            (selectedCategory == null || selectedCategory == item.category))
+            (allowedCategories == null ||
+                allowedCategories!.contains(item.category)))
         .where((item) =>
             filterStartDate == null ||
             item.date
@@ -102,7 +85,7 @@ class RelativeChangeController extends GetxController {
             item.date.isBefore(filterEndDate!.add(const Duration(days: 1))))
         .toList();
 
-    Map<ExpenseDirection, List<LineData>> directionMap = Map();
+    Map<ExpenseDirection, List<LineData>> directionMap = {};
     DateTime? expenseStartDate, expenseEndDate;
     if (allowedExpenses.isNotEmpty) {
       expenseStartDate = DateUtils.dateOnly(allowedExpenses.first.date);
@@ -130,7 +113,7 @@ class RelativeChangeController extends GetxController {
       if (aggregateBy == AggregateBy.day) {
         map = {
           for (var day in days)
-            DateFormat.yMMMd().format(day):
+            DateFormat.yMMMMd().format(day):
                 expenses.where((e) => DateUtils.isSameDay(e.date, day)).toList()
         };
       } else {
@@ -149,7 +132,7 @@ class RelativeChangeController extends GetxController {
 
     List<LineSeriesData> res = directionMap.entries
         .map<LineSeriesData>(
-            (e) => LineSeriesData(toExpenseDirectionString(e.key), e.value))
+            (e) => LineSeriesData(e.key.toExpenseDirectionUIString(), e.value))
         .toList();
     return res;
   }
@@ -171,5 +154,6 @@ class LineSeriesData {
 
 enum AggregateBy { month, day }
 
-String toAggregateByUiString(AggregateBy e) =>
-    e == AggregateBy.month ? "Month" : "Day";
+extension UIStrings on AggregateBy {
+  String toUiString() => this == AggregateBy.month ? "Month" : "Day";
+}

@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 
 import '../auth/auth.dart';
 import '../ui/bar_pie_chart_page.dart';
+import '../ui/expenses_filter_modal.dart';
 import '../ui/expenses_page.dart';
-import '../ui/list_filter.dart';
 import '../ui/nav_drawer.dart';
 import '../ui/relative_change_screen.dart';
 import '../ui/settings_page.dart';
 import '../ui/targets_page.dart';
+import 'loading_mixin.dart';
 
 enum HomeScreen {
   expenses,
@@ -19,16 +20,10 @@ enum HomeScreen {
   relative_change
 }
 
-class HomeController extends GetxController {
-  bool isLoading = false;
+class HomeController extends GetxController with LoadingMixin {
   HomeNavigationEntry currentEntry = navEntries
       .where((element) => element.screen == HomeScreen.expenses)
       .toList()[0];
-
-  void setLoadingState(bool newState) {
-    isLoading = newState;
-    update();
-  }
 
   void setScreen(HomeScreen newScreen) {
     currentEntry =
@@ -51,7 +46,8 @@ class HomeController extends GetxController {
       actions: [
         IconButton(
           onPressed: () => showModalBottomSheet(
-              context: Get.context!, builder: (context) => const ListFilter()),
+              context: Get.context!,
+              builder: (context) => const ExpensesFilterModal()),
           icon: const Icon(Icons.filter_list),
           tooltip: "Filter",
         ),

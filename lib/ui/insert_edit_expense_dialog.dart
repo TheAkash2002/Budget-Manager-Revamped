@@ -95,7 +95,7 @@ class InsertEditExpenseDialog extends StatelessWidget {
                   child: InputDecorator(
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(), labelText: "Date"),
-                    child: Text(DateFormat.yMMMd().format(_.pickerDate)),
+                    child: Text(DateFormat.yMMMMd().format(_.pickerDate)),
                   ),
                 ),
               ),
@@ -104,7 +104,7 @@ class InsertEditExpenseDialog extends StatelessWidget {
                 textAlign: TextAlign.start,
               ),
               ...(ExpenseDirection.values.map<ListTile>((e) => ListTile(
-                    title: Text(toExpenseDirectionString(e)),
+                    title: Text(e.toExpenseDirectionUIString()),
                     leading: Radio<ExpenseDirection>(
                       value: e,
                       groupValue: _.expenseDirection,

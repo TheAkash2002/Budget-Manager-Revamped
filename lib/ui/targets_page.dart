@@ -27,15 +27,12 @@ class Targets extends StatelessWidget {
             if (!snapshot.hasData) {
               return const Center(child: Text("No data!"));
             }
-            return Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) =>
-                      TargetItem(snapshot.data![index], _.removeTarget),
-                ),
+            return Container(
+              padding: const EdgeInsets.all(15),
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) =>
+                    TargetItem(snapshot.data![index], _.removeTarget),
               ),
             );
           }),

@@ -5,14 +5,15 @@ import 'package:get/get.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import '../auth/auth.dart';
-import '../controller/home_controller.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../ui/confirm_insert_without_target_dialog.dart';
 import '../ui/insert_edit_expense_dialog.dart';
 import '../utils/utils.dart';
+import 'filter_mixin.dart';
+import 'home_controller.dart';
 
-class ExpenseController extends GetxController {
+class ExpenseController extends GetxController with FilterControllerMixin {
   late TextEditingController amountController,
       categoryController,
       descriptionController;
@@ -21,7 +22,6 @@ class ExpenseController extends GetxController {
   Stream<List<Expense>> paymentStream = const Stream<List<Expense>>.empty();
 
   late List<String> allCategories;
-  List<String?> filterCategoryOptions = List<String?>.empty();
 
   Expense? currentExpense;
 
@@ -30,7 +30,6 @@ class ExpenseController extends GetxController {
     amountController = TextEditingController();
     categoryController = TextEditingController();
     descriptionController = TextEditingController();
-    allCategories = List.empty();
   }
 
   @override
@@ -47,9 +46,7 @@ class ExpenseController extends GetxController {
             filterStreamController.stream, filterListUsingState);
     allCategories = await getExistingCategoriesList();
 
-    final List<String?> augList = [null];
-    augList.addAll(allCategories.toSet());
-    filterCategoryOptions = augList;
+    populateFilterCategoryOptions(allCategories);
 
     applyFilter();
     update();
@@ -95,12 +92,14 @@ class ExpenseController extends GetxController {
   }
 
   Future<void> refreshInsertEditExpenseControllers() async {
+    setLoadingState(true);
     amountController.clear();
     categoryController.clear();
     descriptionController.clear();
     pickerDate = DateTime.now();
     expenseDirection = ExpenseDirection.payment;
     allCategories = await getExistingCategoriesList();
+    setLoadingState(false);
   }
 
   Future<bool> validateExpenseDialog(ExpenseDialogMode mode) async {
@@ -190,6 +189,7 @@ class ExpenseController extends GetxController {
   }
 
   Future<void> instantiateEditExpenseControllers(Expense expense) async {
+    setLoadingState(true);
     currentExpense = expense;
     amountController.text = currentExpense!.amount.toString();
     categoryController.text = currentExpense!.category;
@@ -197,51 +197,8 @@ class ExpenseController extends GetxController {
     setExpenseDirection(currentExpense!.direction);
     setPickerDate(currentExpense!.date);
     allCategories = await getExistingCategoriesList();
+    setLoadingState(false);
   }
-
-  //Filter functions
-  Set<ExpenseDirection> allowedDirections = ExpenseDirection.values.toSet();
-  Set<String>? allowedCategories;
-  DateTime? filterStartDate, filterEndDate;
-
-  void onSelectCategory(String? category, bool selected) {
-    if (selected) {
-      if (category == null) {
-        allowedCategories = null;
-      } else {
-        allowedCategories ??= <String>{};
-        allowedCategories?.add(category);
-      }
-    } else {
-      if (category != null) {
-        allowedCategories?.remove(category);
-      }
-    }
-    update();
-  }
-
-  void onSelectExpenseDirectionChip(ExpenseDirection ed, bool selected) {
-    if (selected) {
-      allowedDirections.add(ed);
-    } else {
-      allowedDirections.remove(ed);
-    }
-    update();
-  }
-
-  void setFilterStartDate(DateTime? dateTime) {
-    filterStartDate = dateTime;
-    update();
-  }
-
-  void setFilterEndDate(DateTime? dateTime) {
-    filterEndDate = dateTime;
-    update();
-  }
-
-  void resetFilterStartDate() => setFilterStartDate(null);
-
-  void resetFilterEndDate() => setFilterEndDate(null);
 
   void applyFilter() => filterStreamController.add(FilterState(
         allowedDirections: allowedDirections,
@@ -274,6 +231,11 @@ class ExpenseController extends GetxController {
 
   void setLoadingState(bool newState) =>
       Get.find<HomeController>().setLoadingState(newState);
+
+  @override
+  void triggerDataChange() {
+    update();
+  }
 }
 
 class FilterState {

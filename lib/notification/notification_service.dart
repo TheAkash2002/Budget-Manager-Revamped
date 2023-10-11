@@ -155,6 +155,5 @@ Future<Expense?> insertExpenseFromCapturedNotification(
   return await insertExpense(newExpense);
 }
 
-void dispatchNotification(String title, String message, String newId) async {
-  await plugin.show(id++, title, message, notificationDetails, payload: newId);
-}
+void dispatchNotification(String title, String message, String newId) =>
+    plugin.show(id++, title, message, notificationDetails, payload: newId);

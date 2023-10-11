@@ -1,14 +1,9 @@
 import 'package:get/get.dart';
 
 import '../auth/auth.dart';
+import 'loading_mixin.dart';
 
-class AuthController extends GetxController {
-  bool isLoading = false;
-
-  void setLoadingState(bool newState) {
-    isLoading = newState;
-    update();
-  }
+class AuthController extends GetxController with LoadingMixin{
 
   Future<void> signInUser() async {
     setLoadingState(true);

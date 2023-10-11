@@ -27,15 +27,12 @@ class Expenses extends StatelessWidget {
             if (!snapshot.hasData) {
               return const Center(child: Text("No data!"));
             }
-            return Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) =>
-                      ExpenseItem(snapshot.data![index], _.removeExpense),
-                ),
+            return Container(
+              padding: const EdgeInsets.all(15),
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) =>
+                    ExpenseItem(snapshot.data![index], _.removeExpense),
               ),
             );
           }),
@@ -64,8 +61,8 @@ class ExpenseItem extends StatelessWidget {
                   RowWidget("Amount: ₹${expense.amount}"),
                   RowWidget("Category: ${expense.category}"),
                   RowWidget(
-                      "Type: ${toExpenseDirectionUIString(expense.direction)}"),
-                  RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
+                      "Type: ${expense.direction.toExpenseDirectionUIString()}"),
+                  RowWidget("Date: ${DateFormat.yMMMMd().format(expense.date)}"),
                 ],
               ),
             ),
@@ -133,10 +130,10 @@ class ExpenseDetailsDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           RowWidget("Amount: ₹${expense.amount}"),
-          RowWidget("Type: ${toExpenseDirectionUIString(expense.direction)}"),
+          RowWidget("Type: ${expense.direction.toExpenseDirectionUIString()}"),
           RowWidget("Category: ${expense.category}"),
           RowWidget("Description: ${expense.description}"),
-          RowWidget("Date: ${DateFormat.yMMMd().format(expense.date)}"),
+          RowWidget("Date: ${DateFormat.yMMMMd().format(expense.date)}"),
         ],
       ),
       actions: <Widget>[
