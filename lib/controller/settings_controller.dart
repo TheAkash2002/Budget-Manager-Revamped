@@ -48,11 +48,8 @@ class SettingsController extends GetxController {
   }
 
   Future<void> refreshPermission(Permissions perm) async {
-    log.warning("Step1 $perm");
     setStatus(perm, PermissionStatus.loading);
-    log.warning("Step2 $perm");
     setStatus(perm, await checkStatus(perm));
-    log.warning("Step3 $perm");
   }
 
   Future<void> requestPermission(Permissions perm) async {

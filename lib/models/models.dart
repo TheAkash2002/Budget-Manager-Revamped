@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 enum ExpenseDirection { payment, loan_credit, loan_debit }
 
@@ -21,7 +22,7 @@ const String colTargetDate = "Date";
 const String colTargetLastEdit = "LastEdit";
 const String colTargetUUID = "TargetUUID";
 
-extension ExpenseDirectionStrings on ExpenseDirection {
+extension ExpenseDirectionExtensions on ExpenseDirection {
   String toExpenseDirectionString() {
     switch (this) {
       case ExpenseDirection.payment:
@@ -45,6 +46,17 @@ extension ExpenseDirectionStrings on ExpenseDirection {
         return "Debit";
       default:
         return "Unknown";
+    }
+  }
+
+  Icon icon() {
+    switch (this) {
+      case ExpenseDirection.payment:
+        return const Icon(Icons.attach_money);
+      case ExpenseDirection.loan_credit:
+        return const Icon(Icons.warning_amber);
+      case ExpenseDirection.loan_debit:
+        return const Icon(Icons.credit_card);
     }
   }
 }

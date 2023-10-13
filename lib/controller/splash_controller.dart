@@ -89,7 +89,7 @@ class SplashController extends GetxController with LoadingMixin {
   }
 
   void checkLoginStatus() {
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (isLoggedIn()) {
         Get.offAllNamed('/');
       } else {

@@ -27,12 +27,24 @@ class Targets extends StatelessWidget {
             if (!snapshot.hasData) {
               return const Center(child: Text("No data!"));
             }
-            return Container(
-              padding: const EdgeInsets.all(15),
-              child: ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) =>
-                    TargetItem(snapshot.data![index], _.removeTarget),
+            if (snapshot.data!.isEmpty) {
+              return const Center(
+                  child: Text(
+                      "No targets found. Add a target to see its details here."));
+            }
+            double width = double.maxFinite;
+            if (MediaQuery.of(context).orientation == Orientation.landscape) {
+              width = MediaQuery.of(context).size.width * 0.7;
+            }
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                width: width,
+                child: ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) =>
+                      TargetItem(snapshot.data![index], _.removeTarget),
+                ),
               ),
             );
           }),
@@ -49,34 +61,46 @@ class TargetItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                RowWidget("Amount: ₹${target.amount}"),
-                RowWidget("Month: ${DateFormat.yMMMM().format(target.date)}"),
-              ],
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RowWidget(
+                    "₹${target.amount}",
+                    isHeader: true,
+                  ),
+                  RowWidget(
+                    "${DateFormat.yMMMM().format(target.date)}",
+                    icon: Icon(Icons.calendar_month_sharp),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                tooltip: 'Edit Target',
-                icon: const Icon(Icons.edit),
-                onPressed: showEditTargetDialog,
+            IntrinsicWidth(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ResizableIconButton(
+                    tooltip: 'Edit Target',
+                    icon: const Icon(Icons.edit),
+                    onPressed: showEditTargetDialog,
+                  ),
+                  ResizableIconButton(
+                    tooltip: 'Delete Target',
+                    icon: const Icon(Icons.delete),
+                    onPressed: deleteTarget,
+                  ),
+                ],
               ),
-              IconButton(
-                tooltip: 'Delete Target',
-                icon: const Icon(Icons.delete),
-                onPressed: deleteTarget,
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

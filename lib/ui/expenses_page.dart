@@ -27,12 +27,24 @@ class Expenses extends StatelessWidget {
             if (!snapshot.hasData) {
               return const Center(child: Text("No data!"));
             }
-            return Container(
-              padding: const EdgeInsets.all(15),
-              child: ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) =>
-                    ExpenseItem(snapshot.data![index], _.removeExpense),
+            if (snapshot.data!.isEmpty) {
+              return const Center(
+                  child: Text(
+                      "No expenses found. Add an expense to see its details here."));
+            }
+            double width = double.maxFinite;
+            if (MediaQuery.of(context).orientation == Orientation.landscape) {
+              width = MediaQuery.of(context).size.width * 0.7;
+            }
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                width: width,
+                child: ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) =>
+                      ExpenseItem(snapshot.data![index], _.removeExpense),
+                ),
               ),
             );
           }),
@@ -49,40 +61,57 @@ class ExpenseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: InkWell(
-              onTap: showExpenseDetailsDialog,
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: showExpenseDetailsDialog,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RowWidget(
+                      "₹${expense.amount}",
+                      isHeader: true,
+                    ),
+                    RowWidget(
+                      "${expense.category}",
+                      icon: Icon(Icons.category),
+                    ),
+                    RowWidget(
+                        "${expense.direction.toExpenseDirectionUIString()}",
+                        icon: expense.direction.icon()),
+                    RowWidget(
+                      "${DateFormat.yMMMMd().format(expense.date)}",
+                      icon: const Icon(Icons.calendar_month_sharp),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            IntrinsicWidth(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  RowWidget("Amount: ₹${expense.amount}"),
-                  RowWidget("Category: ${expense.category}"),
-                  RowWidget(
-                      "Type: ${expense.direction.toExpenseDirectionUIString()}"),
-                  RowWidget("Date: ${DateFormat.yMMMMd().format(expense.date)}"),
+                  ResizableIconButton(
+                    tooltip: 'Edit Expense',
+                    icon: const Icon(Icons.edit),
+                    onPressed: showEditExpenseDialog,
+                  ),
+                  ResizableIconButton(
+                    tooltip: 'Delete Expense',
+                    icon: const Icon(Icons.delete),
+                    onPressed: deleteExpense,
+                  ),
                 ],
               ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(
-                tooltip: 'Edit Expense',
-                icon: const Icon(Icons.edit),
-                onPressed: showEditExpenseDialog,
-              ),
-              IconButton(
-                tooltip: 'Delete Expense',
-                icon: const Icon(Icons.delete),
-                onPressed: deleteExpense,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
