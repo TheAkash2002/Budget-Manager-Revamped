@@ -1,7 +1,8 @@
-import 'package:budget_manager_revamped/controller/splash_controller.dart';
-import 'package:budget_manager_revamped/ui/custom_components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../controller/splash_controller.dart';
+import 'custom_components.dart';
 
 class Splash extends StatelessWidget {
   const Splash({super.key});

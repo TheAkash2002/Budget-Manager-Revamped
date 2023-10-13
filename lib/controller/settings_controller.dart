@@ -1,8 +1,9 @@
-import 'package:budget_manager_revamped/notification/notification_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../notification/notification_service.dart';
 import '../utils/utils.dart';
 
 class SettingsController extends GetxController {
@@ -27,6 +28,9 @@ class SettingsController extends GetxController {
 
   Future<PermissionStatus> checkStatus(Permissions perm) async {
     PermissionStatus result = PermissionStatus.denied;
+    if (kIsWeb) {
+      return result;
+    }
     switch (perm) {
       case Permissions.sms:
         if (await hasSmsPermission()) {

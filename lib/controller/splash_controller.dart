@@ -1,10 +1,10 @@
-import 'package:budget_manager_revamped/controller/loading_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../auth/auth.dart';
+import '../controller/loading_mixin.dart';
 import '../notification/notification_service.dart';
 
 class SplashController extends GetxController with LoadingMixin {

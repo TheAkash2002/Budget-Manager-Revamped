@@ -1,8 +1,8 @@
-import 'package:budget_manager_revamped/controller/settings_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/settings_controller.dart';
 import '../utils/utils.dart';
 
 class Settings extends StatelessWidget {
@@ -23,16 +23,21 @@ class Settings extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
+            GridView.count(
+              crossAxisCount:
+                  MediaQuery.of(context).orientation == Orientation.portrait
+                      ? 5
+                      : 10,
+              shrinkWrap: true,
               children: themeBaseColors
                   .map((color) => InkWell(
                         onTap: () => changeTheme(color),
-                        child: Container(
-                          color: color,
-                          height: 70,
-                          width: 70,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            constraints: const BoxConstraints.expand(),
+                            color: color,
+                          ),
                         ),
                       ))
                   .toList(),
@@ -78,7 +83,7 @@ class PermissionWidget extends StatelessWidget {
               Row(
                 children: [
                   _.status[permission]!.icon(),
-                  Text(permission.text()),
+                  Expanded(child: Text(permission.text())),
                 ],
               ),
               Row(
