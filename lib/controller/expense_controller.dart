@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-import '../auth/auth.dart';
+
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../ui/confirm_insert_without_target_dialog.dart';
@@ -50,6 +50,13 @@ class ExpenseController extends GetxController with FilterControllerMixin {
 
     applyFilter();
     update();
+  }
+
+  void onChangeDirection(ExpenseDirection ed, bool selected) {
+    if (selected) {
+      expenseDirection = ed;
+      update();
+    }
   }
 
   void createExpense(BuildContext context, ExpenseDialogMode mode) async {

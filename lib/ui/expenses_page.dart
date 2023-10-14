@@ -78,14 +78,14 @@ class ExpenseItem extends StatelessWidget {
                       isHeader: true,
                     ),
                     RowWidget(
-                      "${expense.category}",
-                      icon: Icon(Icons.category),
+                      expense.category,
+                      icon: const Icon(Icons.category),
                     ),
                     RowWidget(
-                        "${expense.direction.toExpenseDirectionUIString()}",
+                        expense.direction.toExpenseDirectionUIString(),
                         icon: expense.direction.icon()),
                     RowWidget(
-                      "${DateFormat.yMMMMd().format(expense.date)}",
+                      DateFormat.yMMMMd().format(expense.date),
                       icon: const Icon(Icons.calendar_month_sharp),
                     ),
                   ],

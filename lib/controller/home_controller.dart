@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../auth/auth.dart';
 import '../ui/bar_pie_chart_page.dart';
 import '../ui/expenses_filter_modal.dart';
 import '../ui/expenses_page.dart';
@@ -9,6 +8,7 @@ import '../ui/nav_drawer.dart';
 import '../ui/relative_change_screen.dart';
 import '../ui/settings_page.dart';
 import '../ui/targets_page.dart';
+import '../utils/utils.dart';
 import 'loading_mixin.dart';
 
 enum HomeScreen {

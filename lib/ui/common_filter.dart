@@ -6,6 +6,7 @@ import '../controller/filter_mixin.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
 
+/// UI for common filter options.
 class CommonFilter<T extends FilterControllerMixin> extends StatelessWidget {
   const CommonFilter({super.key});
 

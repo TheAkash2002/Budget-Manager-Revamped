@@ -75,8 +75,8 @@ class TargetItem extends StatelessWidget {
                     isHeader: true,
                   ),
                   RowWidget(
-                    "${DateFormat.yMMMM().format(target.date)}",
-                    icon: Icon(Icons.calendar_month_sharp),
+                    DateFormat.yMMMM().format(target.date),
+                    icon: const Icon(Icons.calendar_month_sharp),
                   ),
                 ],
               ),

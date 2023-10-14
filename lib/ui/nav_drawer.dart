@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../auth/auth.dart';
 import '../controller/expense_controller.dart';
 import '../controller/home_controller.dart';
 import '../controller/targets_controller.dart';

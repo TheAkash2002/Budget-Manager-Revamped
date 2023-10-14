@@ -4,6 +4,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../controller/bar_pie_controller.dart';
 
+/// Bar chart for BarPieChart page.
 class BarChartComponent extends StatelessWidget {
   const BarChartComponent({super.key});
 

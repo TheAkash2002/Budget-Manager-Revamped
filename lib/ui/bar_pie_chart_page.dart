@@ -6,6 +6,9 @@ import '../ui/bar_chart.dart';
 import '../ui/common_filter.dart';
 import '../ui/pie_chart.dart';
 
+/// Page for viewing Bar and Pie charts of user expenses. Selection of multiple
+/// categories and Expense directions is possible. However, the expenses across
+/// all directions will be summed up to generate the chart value for a category.
 class BarPieChart extends StatelessWidget {
   const BarPieChart({super.key});
 

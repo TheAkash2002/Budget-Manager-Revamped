@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../auth/auth.dart';
+
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';

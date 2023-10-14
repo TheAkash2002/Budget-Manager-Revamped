@@ -103,14 +103,18 @@ class InsertEditExpenseDialog extends StatelessWidget {
                 "Direction:",
                 textAlign: TextAlign.start,
               ),
-              ...(ExpenseDirection.values.map<ListTile>((e) => ListTile(
-                    title: Text(e.toExpenseDirectionUIString()),
-                    leading: Radio<ExpenseDirection>(
-                      value: e,
-                      groupValue: _.expenseDirection,
-                      onChanged: _.setExpenseDirection,
-                    ),
-                  ))),
+              Wrap(
+                spacing: 5,
+                runSpacing: 5,
+                children: ExpenseDirection.values
+                    .map<FilterChip>((e) => FilterChip(
+                          label: Text(e.toExpenseDirectionUIString()),
+                          selected: e == _.expenseDirection,
+                          onSelected: (selected) =>
+                              _.onChangeDirection(e, selected),
+                        ))
+                    .toList(),
+              )
             ],
           ),
         ),
