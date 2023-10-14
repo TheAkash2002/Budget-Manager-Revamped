@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 
 import '../controller/targets_controller.dart';
 import '../models/models.dart';
-import '../ui/insert_edit_target_dialog.dart';
 import 'custom_components.dart';
 import 'delete_target_dialog.dart';
+import 'insert_edit_target_dialog.dart';
 
 class Targets extends StatelessWidget {
   const Targets({super.key});
@@ -43,7 +43,7 @@ class Targets extends StatelessWidget {
                 child: ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
-                      TargetItem(snapshot.data![index], _.removeTarget),
+                      TargetItem(snapshot.data![index]),
                 ),
               ),
             );
@@ -54,9 +54,8 @@ class Targets extends StatelessWidget {
 
 class TargetItem extends StatelessWidget {
   final Target target;
-  final void Function(String) deleteTargetController;
 
-  const TargetItem(this.target, this.deleteTargetController, {super.key});
+  const TargetItem(this.target, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +77,7 @@ class TargetItem extends StatelessWidget {
                     DateFormat.yMMMM().format(target.date),
                     icon: const Icon(Icons.calendar_month_sharp),
                   ),
+                  TargetDelta(target),
                 ],
               ),
             ),
@@ -113,7 +113,7 @@ class TargetItem extends StatelessWidget {
     );
 
     if (confirmDelete != null && confirmDelete) {
-      deleteTargetController(target.id);
+      Get.find<TargetsController>().removeTarget(target.id);
     }
   }
 
@@ -124,6 +124,28 @@ class TargetItem extends StatelessWidget {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) =>
           const InsertEditTargetDialog(TargetDialogMode.edit),
+    );
+  }
+}
+
+class TargetDelta extends StatelessWidget {
+  final Target target;
+
+  const TargetDelta(this.target, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<TargetsController>(
+      builder: (_) => FutureBuilder<TargetDeltaUnit>(
+          initialData: loadingTargetDeltaUnit,
+          future: _.remainingAmount(target),
+          builder: (context, snapshot) {
+            TargetDeltaUnit unit = snapshot.data ?? loadingTargetDeltaUnit;
+            return RowWidget(
+              unit.text,
+              icon: unit.icon,
+            );
+          }),
     );
   }
 }

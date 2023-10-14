@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../ui/confirm_insert_without_target_dialog.dart';
@@ -95,6 +94,7 @@ class ExpenseController extends GetxController with FilterControllerMixin {
   void removeExpense(String expenseId) async {
     setLoadingState(true);
     await deleteExpense(expenseId);
+    showToast("Success", "Deleted expense successfully!");
     setLoadingState(false);
   }
 
@@ -141,12 +141,9 @@ class ExpenseController extends GetxController with FilterControllerMixin {
     }
 
     double target = await getTarget(pickerDate);
-    List<double> expenseValues = (await getAllExpensesInGivenMonth(pickerDate))
-        .map((e) => e.amount)
-        .toList();
-    double expensesInGivenMonth = (expenseValues.isEmpty
-        ? 0
-        : expenseValues.reduce((value, element) => value + element));
+    double expensesInGivenMonth =
+        await getExpensesValueInGivenMonth(pickerDate);
+
     double currentAmount = double.tryParse(amountController.text)!;
     if (isEditMode) {
       expensesInGivenMonth -= currentExpense!.amount;

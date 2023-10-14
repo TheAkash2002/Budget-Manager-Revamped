@@ -38,12 +38,12 @@ class Expenses extends StatelessWidget {
             }
             return Center(
               child: Container(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 width: width,
                 child: ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
-                      ExpenseItem(snapshot.data![index], _.removeExpense),
+                      ExpenseItem(snapshot.data![index]),
                 ),
               ),
             );
@@ -54,9 +54,8 @@ class Expenses extends StatelessWidget {
 
 class ExpenseItem extends StatelessWidget {
   final Expense expense;
-  final void Function(String) deleteExpenseController;
 
-  const ExpenseItem(this.expense, this.deleteExpenseController, {super.key});
+  const ExpenseItem(this.expense, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +80,7 @@ class ExpenseItem extends StatelessWidget {
                       expense.category,
                       icon: const Icon(Icons.category),
                     ),
-                    RowWidget(
-                        expense.direction.toExpenseDirectionUIString(),
+                    RowWidget(expense.direction.toExpenseDirectionUIString(),
                         icon: expense.direction.icon()),
                     RowWidget(
                       DateFormat.yMMMMd().format(expense.date),
@@ -124,7 +122,7 @@ class ExpenseItem extends StatelessWidget {
     );
 
     if (confirmDelete != null && confirmDelete) {
-      deleteExpenseController(expense.id);
+      Get.find<ExpenseController>().removeExpense(expense.id);
     }
   }
 

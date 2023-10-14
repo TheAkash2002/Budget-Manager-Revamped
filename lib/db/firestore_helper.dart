@@ -104,7 +104,7 @@ Future<List<Expense>> getAllExpenses() async {
   return [];
 }
 
-Future<List<Expense>> getAllExpensesInGivenMonth(DateTime dateTime) async {
+Future<double> getExpensesValueInGivenMonth(DateTime dateTime) async {
   try {
     String firstDay = getFirstDayOfMonth(dateTime).toIso8601String();
     String lastDay = getLastDayOfMonth(dateTime).toIso8601String();
@@ -114,9 +114,10 @@ Future<List<Expense>> getAllExpensesInGivenMonth(DateTime dateTime) async {
             .orderBy(colExpenseDate, descending: true)
             .get())
         .docs;
-    return docs.map(Expense.fromQDS).toList();
+    return docs.map(Expense.fromQDS).map((e) => e.amount)
+        .fold<double>(0, (value, element) => value + element);
   } catch (e) {}
-  return [];
+  return 0;
 }
 
 Future<void> updateExpense(Expense expense) async {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
@@ -89,11 +88,33 @@ class TargetsController extends GetxController {
     }
   }
 
-  void removeTarget(String expenseId) async {
+  void removeTarget(String targetId) async {
     setLoadingState(true);
-    await deleteTarget(expenseId);
+    await deleteTarget(targetId);
     showToast("Success", "Deleted target successfully!");
     setLoadingState(false);
+  }
+
+  Future<TargetDeltaUnit> remainingAmount(Target target) async {
+    double expensesInGivenMonth =
+        await getExpensesValueInGivenMonth(target.date);
+    double balance = target.amount - expensesInGivenMonth;
+    if (balance >= 0) {
+      return TargetDeltaUnit(
+        "₹$balance remaining",
+        const Icon(
+          Icons.health_and_safety_rounded,
+          color: Colors.green,
+        ),
+      );
+    }
+    return TargetDeltaUnit(
+      "₹${-balance} overspent",
+      const Icon(
+        Icons.dangerous,
+        color: Colors.red,
+      ),
+    );
   }
 
   bool validateTargetDialog() {
@@ -113,3 +134,13 @@ class TargetsController extends GetxController {
   void setLoadingState(bool newState) =>
       Get.find<HomeController>().setLoadingState(newState);
 }
+
+class TargetDeltaUnit {
+  String text;
+  Icon icon;
+
+  TargetDeltaUnit(this.text, this.icon);
+}
+
+final TargetDeltaUnit loadingTargetDeltaUnit = TargetDeltaUnit(
+    "Loading", const Icon(Icons.calculate, color: Colors.yellow));
