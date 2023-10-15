@@ -21,13 +21,15 @@ class RowWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) icon!,
-          Text(
-            text,
-            style: isHeader
-                ? const TextStyle(
-                    fontSize: 24,
-                  )
-                : null,
+          Flexible(
+            child: Text(
+              text,
+              style: isHeader
+                  ? const TextStyle(
+                      fontSize: 24,
+                    )
+                  : null,
+            ),
           )
         ],
       ),

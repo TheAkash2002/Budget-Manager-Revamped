@@ -6,6 +6,7 @@ import '../../controller/expense.dart';
 import '../../models/models.dart';
 import '../components/custom_components.dart';
 import '../dialogs/delete_expense.dart';
+import '../dialogs/expense_details.dart';
 import '../dialogs/insert_edit_expense.dart';
 
 class Expenses extends StatelessWidget {
@@ -142,33 +143,4 @@ class ExpenseItem extends StatelessWidget {
         barrierDismissible: false, // user must tap button!
         builder: (BuildContext context) => ExpenseDetailsDialog(expense),
       );
-}
-
-class ExpenseDetailsDialog extends StatelessWidget {
-  final Expense expense;
-
-  const ExpenseDetailsDialog(this.expense, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Details'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RowWidget('Amount: ₹${expense.amount}'),
-          RowWidget('Type: ${expense.direction.toExpenseDirectionUIString()}'),
-          RowWidget('Category: ${expense.category}'),
-          RowWidget('Description: ${expense.description}'),
-          RowWidget('Date: ${DateFormat.yMMMMd().format(expense.date)}'),
-        ],
-      ),
-      actions: <Widget>[
-        ElevatedButton(
-          child: const Text('Dismiss'),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    );
-  }
 }
