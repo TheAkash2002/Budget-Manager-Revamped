@@ -15,7 +15,7 @@ jobs:
       - name: Download upload-keystore.jks
         uses: k0staa/download-gdrive-file-action@v1
         with:
-          service-account-auth-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
+          service-account-key-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
           download-file-name: 'upload-keystore.jks'
           download-to: ./android/app/
       - name: Download key.properties
