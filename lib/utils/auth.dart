@@ -39,13 +39,13 @@ Future<void> signIn() async {
   try {
     UserCredential credential = await signInWithGoogle();
     if (credential.user != null) {
-      showToast('Success', 'Logged in successfully.');
+      showToast(ToastType.success, 'Logged in successfully.');
       Get.offAllNamed('/');
     } else {
-      showToast('Error', 'Invalid user - try logging in again.');
+      showToast(ToastType.error, 'Invalid user - try logging in again.');
     }
   } catch (e) {
-    showToast('Error', 'Some error occured.');
+    showToast(ToastType.error, 'Some error occured.');
     log.severe(e);
   }
 }
@@ -55,7 +55,7 @@ Future<void> signOut() async {
   if (!kIsWeb) {
     await GoogleSignIn().signOut();
   }
-  showToast('Success', 'User logged out successfully.');
+  showToast(ToastType.success, 'User logged out successfully.');
 }
 
 /// Opens [Login] after a logout operation.
@@ -64,7 +64,7 @@ void navigateToLoginPage() async {
     await signOut();
     Get.offAllNamed('/login');
   } catch (_) {
-    showToast('Error', 'There was an error in logging the user out.');
+    showToast(ToastType.error, 'There was an error in logging the user out.');
   }
 }
 

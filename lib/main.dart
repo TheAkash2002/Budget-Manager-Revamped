@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'ui/screens/home.dart';
@@ -18,9 +19,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      builder: FToastBuilder(),
       title: 'Budget Manager - Revamped',
       theme: loadThemeData(),
       themeMode: ThemeMode.light,
+      onReady: attachFToast,
       initialRoute: '/splash',
       getPages: [
         GetPage(

@@ -56,7 +56,8 @@ class TargetsController extends GetxController {
         Navigator.of(context).pop(true);
       }
       if (await isTargetSet(pickerDate)) {
-        showToast('Warning', 'Target already exists for given month and year!');
+        showToast(ToastType.warning,
+            'Target already exists for given month and year!');
         throw Exception('Target already exists');
       }
 
@@ -69,7 +70,7 @@ class TargetsController extends GetxController {
         );
         await insertTarget(newTarget);
 
-        showToast('Success', 'Inserted target successfully!');
+        showToast(ToastType.success, 'Inserted target successfully!');
       }
     } catch (e) {
       log.severe(e);
@@ -87,7 +88,7 @@ class TargetsController extends GetxController {
         Navigator.of(context).pop(true);
       }
       await updateTarget(currentTarget!);
-      showToast('Success', 'Updated target successfully!');
+      showToast(ToastType.success, 'Updated target successfully!');
       setLoadingState(false);
     }
   }
@@ -95,7 +96,7 @@ class TargetsController extends GetxController {
   void removeTarget(String targetId) async {
     setLoadingState(true);
     await deleteTarget(targetId);
-    showToast('Success', 'Deleted target successfully!');
+    showToast(ToastType.success, 'Deleted target successfully!');
     setLoadingState(false);
   }
 
@@ -120,7 +121,7 @@ class TargetsController extends GetxController {
   bool validateDialogData() {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
-      showToast('Error', 'Enter valid amount!');
+      showToast(ToastType.success, 'Enter valid amount!');
       return false;
     }
     return true;

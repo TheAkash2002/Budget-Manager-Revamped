@@ -88,7 +88,7 @@ class ExpenseController extends GetxController with FilterControllerMixin {
         lastEdit: DateTime.now(),
       );
       await insertExpense(newExpense);
-      showToast('Success', 'Inserted expense successfully!');
+      showToast(ToastType.success, 'Inserted expense successfully!');
     }
     setLoadingState(false);
   }
@@ -103,7 +103,7 @@ class ExpenseController extends GetxController with FilterControllerMixin {
       currentExpense!.date = pickerDate;
       currentExpense!.lastEdit = DateTime.now();
       await updateExpense(currentExpense!);
-      showToast('Success', 'Updated expense successfully!');
+      showToast(ToastType.success, 'Updated expense successfully!');
     }
     setLoadingState(false);
   }
@@ -111,7 +111,7 @@ class ExpenseController extends GetxController with FilterControllerMixin {
   void removeExpense(String expenseId) async {
     setLoadingState(true);
     await deleteExpense(expenseId);
-    showToast('Success', 'Deleted expense successfully!');
+    showToast(ToastType.success, 'Deleted expense successfully!');
     setLoadingState(false);
   }
 
@@ -130,15 +130,15 @@ class ExpenseController extends GetxController with FilterControllerMixin {
   bool validateDialogData() {
     if (amountController.text.isEmpty ||
         double.tryParse(amountController.text) == null) {
-      showToast('Error', 'Enter valid amount!');
+      showToast(ToastType.error, 'Enter valid amount!');
       return false;
     }
     if (categoryController.text.isEmpty) {
-      showToast('Error', 'Enter a value for category!');
+      showToast(ToastType.error, 'Enter a value for category!');
       return false;
     }
     if (descriptionController.text.isEmpty) {
-      showToast('Error', 'Enter a value for description!');
+      showToast(ToastType.error, 'Enter a value for description!');
       return false;
     }
     return true;

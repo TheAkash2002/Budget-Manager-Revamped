@@ -82,9 +82,9 @@ class SettingsController extends GetxController {
 
   Future<void> initializeReader() async {
     if (await initializeNotificationReaderService()) {
-      showToast('Success', 'Started notification reading service.');
+      showToast(ToastType.success, 'Started notification reading service.');
     } else {
-      showToast('Failed', 'Failed to start notification tracking');
+      showToast(ToastType.error, 'Failed to start notification tracking');
     }
   }
 }

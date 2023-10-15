@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:logging/logging.dart';
@@ -43,7 +44,7 @@ void openDatePicker(BuildContext context, DateTime? initialDate,
       callback(newDate);
     }
   } catch (_) {
-    showToast('Error', 'There was an error in capturing the date.');
+    showToast(ToastType.error, 'There was an error in capturing the date.');
   }
 }
 
@@ -95,19 +96,61 @@ String getInitials(String name) => name.isNotEmpty
     ? name.trim().split(RegExp(' +')).map((s) => s[0]).take(2).join()
     : '';
 
+FToast fToast = FToast();
+
+void attachFToast() {
+  fToast.init(Get.context!);
+}
+
+enum ToastType { success, warning, error }
+
+extension ToastStyle on ToastType {
+  Color color() {
+    switch (this) {
+      case ToastType.success:
+        return Colors.greenAccent;
+
+      case ToastType.warning:
+        return Colors.yellowAccent;
+
+      case ToastType.error:
+        return Colors.redAccent;
+    }
+  }
+
+  Icon icon() {
+    switch (this) {
+      case ToastType.success:
+        return const Icon(Icons.check);
+      case ToastType.warning:
+        return const Icon(Icons.warning_amber);
+      case ToastType.error:
+        return const Icon(Icons.error);
+    }
+  }
+}
+
 /// Utility to display [message] as a toast.
-void showToast(String title, String message) {
-  ScaffoldMessenger.of(Get.context!)
-      .showSnackBar(SnackBar(content: Text(message)));
-  return;
-  Get.snackbar(
-    title,
-    message,
-    colorText: Theme.of(Get.context!).colorScheme.onSurface,
-    backgroundColor: Theme.of(Get.context!).colorScheme.surface,
-    icon: Icon(
-      Icons.add_alert,
-      color: Theme.of(Get.context!).colorScheme.onSurface,
+void showToast(ToastType type, String message) {
+  Widget toast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: type.color(),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        type.icon(),
+        const SizedBox(width: 12.0),
+        Expanded(child: Text(message)),
+      ],
     ),
   );
+  fToast.showToast(
+    child: toast,
+    gravity: ToastGravity.BOTTOM,
+    toastDuration: const Duration(seconds: 2),
+  );
+  return;
 }
