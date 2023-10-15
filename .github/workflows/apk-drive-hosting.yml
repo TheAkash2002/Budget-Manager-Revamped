@@ -21,7 +21,7 @@ jobs:
       - name: Download key.properties
         uses: k0staa/download-gdrive-file-action@v1
         with:
-          service-account-auth-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
+          service-account-key-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
           download-file-name: 'key.properties'
           download-to: ./android/
       - uses: subosito/flutter-action@v2
