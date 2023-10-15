@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/models.dart';
 import '../utils/utils.dart';
 
-const masterCollectionName = "V1";
-const String expenseTableName = "expenses";
-const String targetTableName = "targets";
+const masterCollectionName = 'V1';
+const String expenseTableName = 'expenses';
+const String targetTableName = 'targets';
 
 DocumentReference getDatabase() {
   String? email = FirebaseAuth.instance.currentUser?.email;
   if (email == null) {
-    throw Exception("Not logged in");
+    throw Exception('Not logged in');
   }
   return FirebaseFirestore.instance.collection(masterCollectionName).doc(email);
 }

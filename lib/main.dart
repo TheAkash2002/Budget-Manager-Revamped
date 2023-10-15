@@ -1,24 +1,14 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
-import 'firebase_options.dart';
-import 'ui/home_page.dart';
-import 'ui/login_page.dart';
-import 'ui/splash_page.dart';
+import 'ui/screens/home.dart';
+import 'ui/screens/login.dart';
+import 'ui/screens/splash.dart';
+import 'utils/theme.dart';
 import 'utils/utils.dart';
 
 void main() async {
-  configureLogger();
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top]);
-  await GetStorage.init(THEME_CONTAINER);
+  await initializeMainApp();
   runApp(const MyApp());
 }
 
