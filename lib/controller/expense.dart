@@ -10,6 +10,7 @@ import '../ui/dialogs/inform_insert_without_target.dart';
 import '../ui/dialogs/inform_target_override.dart';
 import '../ui/dialogs/insert_edit_expense.dart';
 import '../utils/auth.dart';
+import '../utils/excel.dart';
 import '../utils/utils.dart';
 import 'filter_mixin.dart';
 import 'home.dart';
@@ -36,6 +37,9 @@ class ExpenseController extends GetxController with FilterControllerMixin {
   StreamController<FilterState> filterStreamController =
       StreamController<FilterState>();
 
+  /// Memoizes the current Expense list for download
+  List<Expense> excelMemo = List<Expense>.empty();
+
   @override
   void onInit() {
     super.onInit();
@@ -51,6 +55,10 @@ class ExpenseController extends GetxController with FilterControllerMixin {
     paymentStream = allExpensesStream()
         .combineLatest<FilterState, List<Expense>>(
             filterStreamController.stream, filterListUsingState);
+
+    paymentStream.listen((event) {
+      excelMemo = event;
+    });
 
     allCategories = await getExistingCategoriesList();
     populateFilterCategoryOptions(allCategories);
@@ -234,6 +242,8 @@ class ExpenseController extends GetxController with FilterControllerMixin {
 
   void setLoadingState(bool newState) =>
       Get.find<HomeController>().setLoadingState(newState);
+
+  void downloadExpenses() => generateExcelForExpenses(excelMemo);
 
   @override
   void triggerDataChange() {

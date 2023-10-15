@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum ExpenseDirection { payment, loan_credit, loan_debit }
 
@@ -132,6 +133,16 @@ class Expense {
   static Expense fromQDS(QueryDocumentSnapshot<Expense> qds) {
     return qds.data();
   }
+
+  static List<dynamic> toExcelRow(Expense expense) => [
+        expense.id,
+        expense.amount,
+        expense.category,
+        expense.description,
+        expense.direction.toExpenseDirectionUIString(),
+        DateFormat.yMMMMd().format(expense.date),
+        DateFormat.yMMMMEEEEd().format(expense.lastEdit),
+      ];
 }
 
 class Target {
@@ -179,6 +190,13 @@ class Target {
   static Target fromQDS(QueryDocumentSnapshot<Target> qds) {
     return qds.data();
   }
+
+  static List<dynamic> toExcelRow(Target target) => [
+        target.id,
+        target.amount,
+        DateFormat.yMMMM().format(target.date),
+        DateFormat.yMMMMEEEEd().format(target.lastEdit),
+      ];
 }
 
 class TargetDeltaUnit {

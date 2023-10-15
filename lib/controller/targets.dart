@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../db/firestore_helper.dart';
 import '../models/models.dart';
 import '../utils/auth.dart';
+import '../utils/excel.dart';
 import '../utils/utils.dart';
 import 'home.dart';
 
@@ -13,6 +14,9 @@ class TargetsController extends GetxController {
   DateTime pickerDate = DateTime.now();
   Stream<List<Target>> targetStream = const Stream<List<Target>>.empty();
   Target? currentTarget;
+
+  /// Memoizes the current Targets list for download
+  List<Target> excelMemo = List<Target>.empty();
 
   @override
   void onInit() {
@@ -39,6 +43,9 @@ class TargetsController extends GetxController {
 
   Future<void> refreshTargetStreamReference() async {
     targetStream = allTargetsStream();
+    targetStream.listen((event) {
+      excelMemo = event;
+    });
     update();
   }
 
@@ -126,4 +133,6 @@ class TargetsController extends GetxController {
 
   void setLoadingState(bool newState) =>
       Get.find<HomeController>().setLoadingState(newState);
+
+  void downloadTargets() => generateExcelForTargets(excelMemo);
 }

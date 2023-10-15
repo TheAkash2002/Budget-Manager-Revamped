@@ -9,7 +9,9 @@ import '../ui/screens/relative_change.dart';
 import '../ui/screens/settings.dart';
 import '../ui/screens/targets.dart';
 import '../utils/auth.dart';
+import 'expense.dart';
 import 'loading_mixin.dart';
+import 'targets.dart';
 
 enum HomeScreen {
   expenses,
@@ -38,12 +40,23 @@ class HomeController extends GetxController with LoadingMixin {
   static void showFilterModal() => showModalBottomSheet(
       context: Get.context!, builder: (context) => const ExpensesFilterModal());
 
+  static void downloadExpenses() =>
+      Get.find<ExpenseController>().downloadExpenses();
+
+  static void downloadTargets() =>
+      Get.find<TargetsController>().downloadTargets();
+
   static List<HomeNavigationEntry> navEntries = [
     HomeNavigationEntry(
       screen: HomeScreen.expenses,
       widget: const Expenses(),
       screenTitle: 'Expenses',
       actions: [
+        const IconButton(
+          onPressed: downloadExpenses,
+          icon: Icon(Icons.download),
+          tooltip: 'Download Expenses',
+        ),
         const IconButton(
           onPressed: showFilterModal,
           icon: Icon(Icons.filter_list),
@@ -62,7 +75,13 @@ class HomeController extends GetxController with LoadingMixin {
       screen: HomeScreen.targets,
       widget: const Targets(),
       screenTitle: 'Monthly Targets',
-      actions: [],
+      actions: [
+        const IconButton(
+          onPressed: downloadTargets,
+          icon: Icon(Icons.download),
+          tooltip: 'Download Targets',
+        ),
+      ],
       fab: const FloatingActionButton(
         onPressed: showCreateTargetDialog,
         tooltip: 'Create New Target',
