@@ -29,11 +29,6 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BUDGET_MANAGER_REVAMPED }}'
-          channelId: live
-          projectId: budget-manager-revamped
       - name: Upload app-release.apk
         uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v1.1.1
         with:
