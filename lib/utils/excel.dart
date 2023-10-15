@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models/models.dart';
 import 'utils.dart';
@@ -68,9 +68,8 @@ Future<void> saveExcelFile(Excel excel, String filePrefix) async {
     ..writeAsBytesSync(fileBytes);
   showToast(ToastType.success, 'File was downloaded to $filePath');
   try {
-    final Uri uri = Uri(scheme: 'content', path: filePath);
-    if (!await launchUrl(uri)) {
-      showToast(ToastType.error, 'Could not open file.');
-    }
-  } catch (e) {}
+    OpenFile.open(filePath);
+  } catch (e) {
+    showToast(ToastType.error, 'Could not open file.');
+  }
 }
