@@ -10,10 +10,6 @@ Budget Manager - revamped and more customizable than ever!
    and place them in their respective folders as follows.
     - `upload-keystore.jks`: `android\app`
     - `key.properties`: `android`
-    - `google-services.json`: `android\app`
-    - `GoogleService-Info.plist`: `ios\Runner`
-    - `firebase_app_id_file.json`: `ios`
-    - `firebase_options.dart`: `lib`
 3. Open the repository in Android Studio.
 
 This project is a starting point for a Flutter application.

@@ -143,7 +143,7 @@ void showToast(ToastType type, String message) {
       children: [
         type.icon(),
         const SizedBox(width: 12.0),
-        Expanded(child: Text(message)),
+        Flexible(child: Text(message)),
       ],
     ),
   );

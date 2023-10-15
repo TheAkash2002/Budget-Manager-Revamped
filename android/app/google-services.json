@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "543806373604",
+    "project_id": "budget-manager-revamped",
+    "storage_bucket": "budget-manager-revamped.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543806373604:android:0133f39e0ff5f7cc8436f1",
+        "android_client_info": {
+          "package_name": "com.princeakash.budget_manager_revamped"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "543806373604-13v1g857muu1vpjje5sv74k5bjpr45mh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.princeakash.budget_manager_revamped",
+            "certificate_hash": "4e50cf2e2fecfd2253b4530816d2a33ecc97e17f"
+          }
+        },
+        {
+          "client_id": "543806373604-ienje25io5mm2h1inua6bpb4m1af3i31.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.princeakash.budget_manager_revamped",
+            "certificate_hash": "57550bbccf8f1759fcc8bec7fcbfb765e8de6d44"
+          }
+        },
+        {
+          "client_id": "543806373604-4d7ru8u7ts5470puv4jnuhcmg2kpn70k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoBdHhkVVN95lSi9DikoEwvu4K0oAjqfY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "543806373604-4d7ru8u7ts5470puv4jnuhcmg2kpn70k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "543806373604-4r29ole0p5r8v026vkmc8oj6u6lqakq5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.princeakash.budgetManagerRevamped"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
