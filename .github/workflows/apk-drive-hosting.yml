@@ -1,0 +1,42 @@
+name: Deploy APK to Google Drive on merge
+'on':
+  push:
+    branches:
+      - master
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Download upload-keystore.jks
+        uses: k0staa/download-gdrive-file-action@v1
+        with:
+          service-account-auth-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
+          download-file-name: 'upload-keystore.jks'
+          download-to: ./android/app/
+      - name: Download key.properties
+        uses: k0staa/download-gdrive-file-action@v1
+        with:
+          service-account-auth-json: ${{ secrets.UD_SERVICE_ACCOUNT }}
+          download-file-name: 'key.properties'
+          download-to: ./android/
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build apk
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BUDGET_MANAGER_REVAMPED }}'
+          channelId: live
+          projectId: budget-manager-revamped
+      - name: Upload app-release.apk
+        uses: Jumbo810/Upload_Github_Artifacts_TO_GDrive@v1.1.1
+        with:
+          target: ./build/app/outputs/flutter-apk/app-release.apk
+          credentials: ${{ secrets.UD_SERVICE_ACCOUNT_BASE }}
+          parent_folder_id: 1-salt_W7yUsgrXvpCXrk5nYo4ywWYA-6
