@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -29,7 +28,7 @@ class SettingsController extends GetxController {
 
   Future<AppPermissionStatus> checkStatus(AppPermissions perm) async {
     AppPermissionStatus result = AppPermissionStatus.denied;
-    if (kIsWeb) {
+    if (!isNotifReadingSupported()) {
       return result;
     }
     switch (perm) {

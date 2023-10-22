@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,12 @@ import 'permissions.dart';
 import 'utils.dart';
 
 const BACKGROUND_METHOD_CHANNEL_NAME = 'princeAkash/background';
+
+/**
+ * Basic Util
+ */
+
+bool isNotifReadingSupported() => Platform.isAndroid;
 
 /**
  *  Notification Reader

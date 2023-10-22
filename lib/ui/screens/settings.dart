@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/settings.dart';
 import '../../models/models.dart';
+import '../../utils/notification.dart';
 import '../../utils/theme.dart';
 
 class Settings extends StatelessWidget {
@@ -44,7 +44,7 @@ class Settings extends StatelessWidget {
                   .toList(),
             ),
             const SizedBox(height: 8),
-            if (!kIsWeb) ...[
+            if (isNotifReadingSupported()) ...[
               const Text(
                 'App Permissions',
                 textAlign: TextAlign.start,

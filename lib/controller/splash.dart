@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,7 +16,7 @@ class SplashController extends GetxController with LoadingMixin {
   void onInit() async {
     super.onInit();
     setLoadingState(true);
-    if (!kIsWeb) {
+    if (isNotifReadingSupported()) {
       if (!await hasLocalPermissions()) {
         await showDialog<bool?>(
           context: Get.context!,

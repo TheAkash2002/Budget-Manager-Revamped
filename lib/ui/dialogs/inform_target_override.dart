@@ -12,8 +12,7 @@ class InformTargetOverride extends StatelessWidget {
       title: const Text('Target Override'),
       content: Text('${isEditMode ? 'Editing' : 'Inserting'} this expense '
           'will override the target of the said month by '
-          'Rs.$overrideAmount. Are you sure you want to '
-          '${isEditMode ? 'edit' : 'insert'} this expense?'),
+          'Rs.$overrideAmount.'),
       actions: <Widget>[
         ElevatedButton(
           child: const Text('Dismiss'),
